@@ -1,0 +1,121 @@
+.container {
+    display: flex;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: white;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+}
+
+h1 {
+    color: #0f345b;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Show 3 items per row */
+    gap: 70px;
+}
+
+.product-card {
+    background-color: #ffffff; /* Use a clean white background */
+    border: 1px solid #ddd;
+    border-radius: 20px; /* Smooth rounded corners */
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Softer shadow for a floating effect */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-10px); /* Slight lift on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05); /* Slight zoom effect on hover */
+}
+
+h3 {
+    color: #333;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.add-to-cart-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #218838;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.user-profile-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.user-profile-button:hover {
+    transform: scale(1.1);
+}
+
+/* For smaller screens, adjust to fewer products per row */
+@media screen and (max-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 items per row for tablets */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: 1fr; /* 1 item per row for mobile screens */
+    }
+}

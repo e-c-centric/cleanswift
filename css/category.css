@@ -1,0 +1,96 @@
+.container {
+    display: flex;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: white;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+}
+
+h1 {
+    color: #06213d;
+}
+
+form {
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #112a45;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+button[type="submit"] {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+/* Styling the category list */
+ul#categoryList {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul#categoryList li {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+    border-left: 4px solid #007bff;
+}
+
+/* Styling for delete form */
+button.delete-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.delete-button:hover {
+    background-color: #c82333;
+}
+
+
+.user-profile-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.user-profile-button:hover {
+    transform: scale(1.1);
+}

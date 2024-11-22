@@ -1,0 +1,88 @@
+/* Background image and overlay */
+.background {
+    background-image: url('../images/CleanSwift logo a.webp');
+    background-size: contain;
+    background-position: center;
+    height: 100vh;
+    position: relative;
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.6); /* Dark overlay for contrast */
+    position: absolute;
+    top: 10;
+    left: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Square container with compact size */
+.container {
+    text-align: center;
+    background-color: rgba(255, 255, 255,0.97 ); /* White background for better readability */
+    padding: 30px;
+    border-radius: 10px;
+    width: fit-content;
+    height: fit-content; /* Ensures it's a square-like shape based on content */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Centering content and buttons */
+.container h1, .container p {
+    color: #2980b9; /* Blue color for text */
+}
+
+.welcome-text {
+    font-size: 36px;
+    font-weight: bold;
+    padding: 10px;
+}
+
+.sub-text {
+    font-size: 18px;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+/* Buttons styling */
+.btn-primary {
+    background-color: #2980b9;
+    border: none;
+}
+
+.btn-secondary {
+    background-color: #3498db;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #3498db;
+}
+
+.btn-secondary:hover {
+    background-color: #5dade2;
+}
+
+/* Modal styling */
+.modal-header {
+    background-color: #2980b9;
+    color: #fff;
+}
+
+.modal-footer a {
+    color: #2980b9;
+    text-decoration: none;
+}
+
+.modal-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Form input styling */
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #bdc3c7;
+}

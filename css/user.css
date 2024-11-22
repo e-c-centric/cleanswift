@@ -1,0 +1,121 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #007bff;
+    padding: 20px;
+    color: white;
+}
+
+.sidebar .logo {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.sidebar .nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar .nav ul li {
+    margin-bottom: 20px;
+}
+
+.sidebar .nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    display: block;
+}
+
+.sidebar .nav ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: white;
+}
+
+.main-header h1 {
+    margin-bottom: 20px;
+}
+
+.items-section {
+    margin-top: 30px;
+}
+
+.items-section h2 {
+    margin-bottom: 20px;
+}
+
+.item-list {
+    display: flex;
+    gap: 20px;
+}
+
+.item-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 200px;
+}
+
+.item-card img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.item-card h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.item-card p {
+    font-size: 16px;
+    color: #555;
+}
+
+.add-to-cart {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-to-cart:hover {
+    background-color: #0056b3;
+}
+
+.user-profile-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.user-profile-button:hover {
+    transform: scale(1.1);
+}
