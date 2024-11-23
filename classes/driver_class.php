@@ -58,36 +58,36 @@ class driver_class extends db_connection
     }
 
     //-- Update Driver --//
-    public function update_driver($user_id, $name, $email, $password, $contact, $license_number, $vehicle_id, $vehicle_class)
+    public function update_driver_info($user_id, $username, $email, $contact, $license)
     {
         $user_id = mysqli_real_escape_string($this->db_conn(), $user_id);
-        $name = mysqli_real_escape_string($this->db_conn(), $name);
+        $username = mysqli_real_escape_string($this->db_conn(), $username);
         $email = mysqli_real_escape_string($this->db_conn(), $email);
-        $password = mysqli_real_escape_string($this->db_conn(), $password);
         $contact = mysqli_real_escape_string($this->db_conn(), $contact);
-        $license_number = mysqli_real_escape_string($this->db_conn(), $license_number);
-        $vehicle_id = mysqli_real_escape_string($this->db_conn(), $vehicle_id);
+        $license = mysqli_real_escape_string($this->db_conn(), $license);
+
+        $sql = "UPDATE users SET user_name = '$username', user_email = '$email', user_contact = '$contact' WHERE user_id = '$user_id'";
+        $this->db_query($sql);
+
+        $sql = "UPDATE drivers SET license_number = '$license' WHERE driver_id = '$user_id'";
+        $this->db_query($sql);
+    }
+
+    public function update_vehicle_info($user_id, $vehicle_number, $vehicle_type, $vehicle_class)
+    {
+        $user_id = mysqli_real_escape_string($this->db_conn(), $user_id);
+        $vehicle_number = mysqli_real_escape_string($this->db_conn(), $vehicle_number);
+        $vehicle_type = mysqli_real_escape_string($this->db_conn(), $vehicle_type);
         $vehicle_class = mysqli_real_escape_string($this->db_conn(), $vehicle_class);
 
-        $this->db_conn()->begin_transaction();
-        try {
-            $sqlUser = "UPDATE users SET user_name = '$name', user_email = '$email', user_password = '$password', user_contact = '$contact' 
-                        WHERE user_id = '$user_id'";
-            $this->db_query($sqlUser);
+        $sql = "SELECT vehicle_id FROM drivers WHERE driver_id = '$user_id'";
+        $result = $this->db_fetch_one($sql);
+        $vehicle_id = $result['vehicle_id'];
 
-            $sqlDriver = "UPDATE drivers SET license_number = '$license_number', vehicle_id = '$vehicle_id' 
-                          WHERE driver_id = '$user_id'";
-            $this->db_query($sqlDriver);
-
-            $sqlVehicle = "UPDATE vehicles SET vehicle_class = '$vehicle_class' WHERE vehicle_id = '$vehicle_id'";
-            $this->db_query($sqlVehicle);
-
-            $this->db_conn()->commit();
-        } catch (Exception $e) {
-            $this->db_conn()->rollback();
-            throw $e;
-        }
+        $sql = "UPDATE vehicles SET vehicle_number = '$vehicle_number', vehicle_type = '$vehicle_type', vehicle_class = '$vehicle_class' WHERE vehicle_id = '$vehicle_id'";
+        $this->db_query($sql);
     }
+
 
     //-- Delete Driver --//
     public function delete_driver($user_id)

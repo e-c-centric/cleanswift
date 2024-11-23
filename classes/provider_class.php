@@ -43,24 +43,22 @@ class provider_class extends db_connection
     }
 
     //-- Update Provider --//
-    public function update_provider($user_id, $name, $email, $password, $contact, $provider_name, $provider_address)
+    public function update_provider($user_id, $name, $contact, $provider_name, $provider_address)
     {
         $user_id = mysqli_real_escape_string($this->db_conn(), $user_id);
         $name = mysqli_real_escape_string($this->db_conn(), $name);
-        $email = mysqli_real_escape_string($this->db_conn(), $email);
-        $password = mysqli_real_escape_string($this->db_conn(), $password);
         $contact = mysqli_real_escape_string($this->db_conn(), $contact);
         $provider_name = mysqli_real_escape_string($this->db_conn(), $provider_name);
         $provider_address = mysqli_real_escape_string($this->db_conn(), $provider_address);
 
         $this->db_conn()->begin_transaction();
         try {
-            $sqlUser = "UPDATE users SET user_name = '$name', user_email = '$email', user_password = '$password', user_contact = '$contact' 
-                        WHERE user_id = '$user_id'";
+            $sqlUser = "UPDATE users SET user_name = '$name', user_contact = '$contact' 
+                    WHERE user_id = '$user_id'";
             $this->db_query($sqlUser);
 
             $sqlProvider = "UPDATE providers SET provider_name = '$provider_name', provider_address = '$provider_address' 
-                            WHERE provider_id = '$user_id'";
+                        WHERE provider_id = '$user_id'";
             $this->db_query($sqlProvider);
 
             $this->db_conn()->commit();

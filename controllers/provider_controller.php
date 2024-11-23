@@ -21,10 +21,10 @@ class provider_controller
         }
     }
 
-    public function update_provider($user_id, $name, $email, $password, $contact, $provider_name, $provider_address)
+    public function update_provider($user_id, $name, $contact, $provider_name, $provider_address)
     {
         try {
-            $this->provider->update_provider($user_id, $name, $email, $password, $contact, $provider_name, $provider_address);
+            $this->provider->update_provider($user_id, $name, $contact, $provider_name, $provider_address);
             return "Provider updated successfully.";
         } catch (Exception $e) {
             return "Error updating provider: " . $e->getMessage();

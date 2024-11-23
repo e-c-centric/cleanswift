@@ -342,26 +342,26 @@ $user_name = $_SESSION['name'];
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Edit Profile</h2>
-            <form id="profileForm">
+            <form id="profileForm" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label for="profilePictureInput">Profile Picture</label>
-                    <input type="file" id="profilePictureInput" name="profilePicture" accept="image/*">
+                    <label for="profilePictureInput">Profile Picture (PNG only, Max 2MB)</label>
+                    <input type="file" id="profilePictureInput" name="profilePicture" accept="image/png">
                 </div>
                 <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" id="name" name="name">
+                    <input type="text" id="name" name="name" required>
                 </div>
                 <div class="form-group">
                     <label for="contact">Contact</label>
-                    <input type="text" id="contact" name="contact">
+                    <input type="text" id="contact" name="contact" required>
                 </div>
                 <div class="form-group">
                     <label for="country">Country</label>
-                    <input type="text" id="country" name="country">
+                    <input type="text" id="country" name="country" required>
                 </div>
                 <div class="form-group">
                     <label for="city">City</label>
-                    <input type="text" id="city" name="city">
+                    <input type="text" id="city" name="city" required>
                 </div>
                 <button type="submit" class="save-button">Save</button>
             </form>
@@ -376,15 +376,15 @@ $user_name = $_SESSION['name'];
             <form id="passwordForm">
                 <div class="form-group">
                     <label for="oldPassword">Old Password</label>
-                    <input type="password" id="oldPassword" name="oldPassword">
+                    <input type="password" id="oldPassword" name="oldPassword" required>
                 </div>
                 <div class="form-group">
                     <label for="newPassword">New Password</label>
-                    <input type="password" id="newPassword" name="newPassword">
+                    <input type="password" id="newPassword" name="newPassword" required>
                 </div>
                 <div class="form-group">
                     <label for="confirmPassword">Confirm New Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword">
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
                 </div>
                 <button type="submit" class="save-button">Save</button>
             </form>
@@ -393,36 +393,9 @@ $user_name = $_SESSION['name'];
 
     <script>
         $(document).ready(function() {
-            $.ajax({
-                url: '../actions/getCustomerProfileInfo.php',
-                type: 'GET',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        var data = response.data;
-                        $('#profileName').text(data.user_name);
-                        $('#profileContact').text(data.user_contact);
-                        $('#profileCountry').text(data.customer_country);
-                        $('#profileCity').text(data.customer_city);
-                        $('#name').val(data.user_name);
-                        $('#contact').val(data.user_contact);
-                        $('#country').val(data.customer_country);
-                        $('#city').val(data.customer_city);
 
-                        if (data.customer_image) {
-                            var imgSrc = 'data:image/jpeg;base64,' + btoa(String.fromCharCode.apply(null, new Uint8Array(data.customer_image)));
-                            $('#profilePicture').attr('src', imgSrc);
-                        }
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.message
-                        });
-                    }
-                }
-            });
+            loadCustomerProfile();
 
-            // Get the modals
             var editProfileModal = document.getElementById('editProfileModal');
             var changePasswordModal = document.getElementById('changePasswordModal');
 
@@ -461,7 +434,6 @@ $user_name = $_SESSION['name'];
                 var newPassword = $('#newPassword').val().trim();
                 var confirmPassword = $('#confirmPassword').val().trim();
 
-                // Basic validation
                 if (!oldPassword || !newPassword || !confirmPassword) {
                     Swal.fire({
                         icon: 'error',
@@ -495,7 +467,7 @@ $user_name = $_SESSION['name'];
                         });
                         if (response.status === 'success') {
                             changePasswordModal.style.display = "none";
-                            $('#passwordForm')[0].reset(); // Reset the form
+                            $('#passwordForm')[0].reset();
                         }
                     },
                     error: function(xhr, status, error) {
@@ -507,8 +479,122 @@ $user_name = $_SESSION['name'];
                     }
                 });
             });
+
+            $('#profileForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var form = this;
+                var fileInput = $('#profilePictureInput')[0];
+                var file = fileInput.files[0];
+
+                // Validate file only if a file is selected
+                if (file) {
+                    // Validate file type (PNG)
+                    if (file.type !== 'image/png') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid File Type',
+                            text: 'Only PNG files are allowed for the profile picture.'
+                        });
+                        return;
+                    }
+
+                    // Validate file size (Max 2MB)
+                    var maxSize = 2 * 1024 * 1024; // 2MB
+                    if (file.size > maxSize) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File Too Large',
+                            text: 'The profile picture must be less than 2MB.'
+                        });
+                        return;
+                    }
+                }
+
+                var formData = new FormData(form);
+
+                $.ajax({
+                    url: '../actions/updateCustomerProfileInfo.php', // Ensure this endpoint exists
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    dataType: 'json', // Ensure response is treated as JSON
+                    success: function(response) {
+                        Swal.fire({
+                            icon: response.status === 'success' ? 'success' : 'error',
+                            title: response.message
+                        });
+                        if (response.status === 'success') {
+                            editProfileModal.style.display = "none";
+                            $('#profileForm')[0].reset();
+                            loadCustomerProfile(); // Refresh the profile info
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to update profile.',
+                            text: error
+                        });
+                    }
+                });
+            });
+
+            function loadCustomerProfile() {
+                $.ajax({
+                    url: '../actions/getCustomerProfileInfo.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            var data = response.data;
+                            $('#profileName').text(data.user_name);
+                            $('#profileContact').text(data.user_contact);
+                            $('#profileCountry').text(data.customer_country);
+                            $('#profileCity').text(data.customer_city);
+                            $('#name').val(data.user_name);
+                            $('#contact').val(data.user_contact);
+                            $('#country').val(data.customer_country);
+                            $('#city').val(data.customer_city);
+
+                            if (data.customer_image) {
+                                var imgSrc = 'data:image/png;base64,' + data.customer_image;
+                                $('#profilePicture').attr('src', imgSrc);
+                            } else {
+                                $('#profilePicture').attr('src', '../images/default_profile.png');
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to fetch profile information.',
+                            text: error
+                        });
+                    }
+                });
+            }
+
+            $('#profilePictureInput').on('change', function() {
+                var file = this.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#profilePicture').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
         });
     </script>
+
 </body>
 
 </html>

@@ -44,25 +44,16 @@ class customer_class extends db_connection
     }
 
     //-- Update Customer --//
-    public function update_customer($user_id, $name = null, $email = null, $password = null, $contact = null, $country = null, $city = null, $image = null)
+    public function update_customer($user_id, $name = null, $contact = null, $country = null, $city = null, $image = null)
     {
         $user_id = mysqli_real_escape_string($this->db_conn(), $user_id);
 
         $this->db_conn()->begin_transaction();
         try {
-            // Update users table
             $userUpdates = [];
             if ($name !== null) {
                 $name = mysqli_real_escape_string($this->db_conn(), $name);
                 $userUpdates[] = "user_name = '$name'";
-            }
-            if ($email !== null) {
-                $email = mysqli_real_escape_string($this->db_conn(), $email);
-                $userUpdates[] = "user_email = '$email'";
-            }
-            if ($password !== null) {
-                $password = mysqli_real_escape_string($this->db_conn(), $password);
-                $userUpdates[] = "user_password = '$password'";
             }
             if ($contact !== null) {
                 $contact = mysqli_real_escape_string($this->db_conn(), $contact);
@@ -71,10 +62,10 @@ class customer_class extends db_connection
 
             if (!empty($userUpdates)) {
                 $sqlUser = "UPDATE users SET " . implode(', ', $userUpdates) . " WHERE user_id = '$user_id'";
-                $this->db_query($sqlUser);
+                if (!$this->db_query($sqlUser)) {
+                    throw new Exception("Failed to update users table");
+                }
             }
-
-            // Update customers table
             $customerUpdates = [];
             if ($country !== null) {
                 $country = mysqli_real_escape_string($this->db_conn(), $country);
@@ -85,13 +76,19 @@ class customer_class extends db_connection
                 $customerUpdates[] = "customer_city = '$city'";
             }
             if ($image !== null) {
-                $image = mysqli_real_escape_string($this->db_conn(), $image);
-                $customerUpdates[] = "customer_image = '$image'";
+                $decodedImage = base64_decode($image);
+                if ($decodedImage === false) {
+                    throw new Exception("Failed to decode image data.");
+                }
+                $decodedImage = mysqli_real_escape_string($this->db_conn(), $decodedImage);
+                $customerUpdates[] = "customer_image = '$decodedImage'";
             }
 
             if (!empty($customerUpdates)) {
                 $sqlCustomer = "UPDATE customers SET " . implode(', ', $customerUpdates) . " WHERE customer_id = '$user_id'";
-                $this->db_query($sqlCustomer);
+                if (!$this->db_query($sqlCustomer)) {
+                    throw new Exception("Failed to update customers table");
+                }
             }
 
             $this->db_conn()->commit();
@@ -129,6 +126,12 @@ class customer_class extends db_connection
                 FROM users u 
                 JOIN customers c ON u.user_id = c.customer_id 
                 WHERE u.user_id = '$user_id'";
-        return $this->db_fetch_one($sql);
+        $result = $this->db_fetch_one($sql);
+
+        if ($result && $result['customer_image']) {
+            $result['customer_image'] = base64_encode($result['customer_image']);
+        }
+
+        return $result;
     }
 }

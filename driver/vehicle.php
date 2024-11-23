@@ -453,9 +453,8 @@ $user_name = $_SESSION['name'];
                     return;
                 }
 
-                // Send the updated profile data via AJAX
                 $.ajax({
-                    url: '../actions/updateDriverVehicle.php', // Ensure this endpoint exists
+                    url: '../actions/updateVehicleInfo.php', 
                     type: 'POST',
                     dataType: 'json',
                     data: {

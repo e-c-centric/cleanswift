@@ -21,13 +21,23 @@ class driver_controller
         }
     }
 
-    public function update_driver($user_id, $name, $email, $password, $contact, $license_number, $vehicle_id, $vehicle_class)
+    public function update_driver($user_id, $name, $email, $contact, $license_number)
     {
         try {
-            $this->driver->update_driver($user_id, $name, $email, $password, $contact, $license_number, $vehicle_id, $vehicle_class);
+            $this->driver->update_driver_info($user_id, $name, $email, $contact, $license_number);
             return "Driver updated successfully.";
         } catch (Exception $e) {
             return "Error updating driver: " . $e->getMessage();
+        }
+    }
+
+    public function update_vehicle($user_id, $vehicle_number, $vehicle_type, $vehicle_class)
+    {
+        try {
+            $this->driver->update_vehicle_info($user_id, $vehicle_number, $vehicle_type, $vehicle_class);
+            return "Vehicle updated successfully.";
+        } catch (Exception $e) {
+            return "Error updating vehicle: " . $e->getMessage();
         }
     }
 

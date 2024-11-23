@@ -448,13 +448,13 @@ $user_name = $_SESSION['name'];
 
                 // Send the updated profile data via AJAX
                 $.ajax({
-                    url: '../actions/updateProviderProfile.php', // Ensure this endpoint exists
+                    url: '../actions/updateProviderInfo.php',
                     type: 'POST',
                     dataType: 'json',
                     data: {
                         provider_name: providerName,
                         provider_address: address,
-                        manager_name: managerName,
+                        name: managerName,
                         contact: contact
                     },
                     success: function(response) {
@@ -464,7 +464,7 @@ $user_name = $_SESSION['name'];
                         });
                         if (response.status === 'success') {
                             editProfileModal.style.display = "none";
-                            loadProviderProfile(); // Refresh the profile info
+                            loadProviderProfile();
                         }
                     },
                     error: function(xhr, status, error) {
@@ -477,20 +477,16 @@ $user_name = $_SESSION['name'];
                 });
             });
 
-            // Change Password Modal Functionality
             var changePasswordModal = document.getElementById('changePasswordModal');
 
-            // When the user clicks the Change Password button, open the modal
             $('#changePassword').on('click', function() {
                 changePasswordModal.style.display = "block";
             });
 
-            // When the user clicks on <span> (x), close the modal
             $('#changePasswordModal .close').on('click', function() {
                 changePasswordModal.style.display = "none";
             });
 
-            // When the user submits the Change Password form
             $('#passwordForm').on('submit', function(event) {
                 event.preventDefault();
 
@@ -498,7 +494,6 @@ $user_name = $_SESSION['name'];
                 var newPassword = $('#newPassword').val().trim();
                 var confirmPassword = $('#confirmPassword').val().trim();
 
-                // Basic validation
                 if (!oldPassword || !newPassword || !confirmPassword) {
                     Swal.fire({
                         icon: 'error',
@@ -532,7 +527,7 @@ $user_name = $_SESSION['name'];
                         });
                         if (response.status === 'success') {
                             changePasswordModal.style.display = "none";
-                            $('#passwordForm')[0].reset(); // Reset the form
+                            $('#passwordForm')[0].reset();
                         }
                     },
                     error: function(xhr, status, error) {
@@ -545,7 +540,6 @@ $user_name = $_SESSION['name'];
                 });
             });
 
-            // Close modals when clicking outside of them
             $(window).on('click', function(event) {
                 if ($(event.target).is(editProfileModal)) {
                     editProfileModal.style.display = "none";

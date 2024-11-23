@@ -21,13 +21,13 @@ class customer_controller
         }
     }
 
-    public function update_customer($user_id, $name = null, $email = null, $password = null, $contact = null, $country = null, $city = null, $image = null)
+    public function update_customer($user_id, $name = null, $contact = null, $country = null, $city = null, $image = null)
     {
         try {
-            $this->customer->update_customer($user_id, $name, $email, $password, $contact, $country, $city, $image);
-            return "Customer updated successfully.";
+            $this->customer->update_customer($user_id, $name, $contact, $country, $city, $image);
+            return ["status" => "success", "message" => "Profile updated successfully."];
         } catch (Exception $e) {
-            return "Error updating customer: " . $e->getMessage();
+            return ["status" => "error", "message" => "Error updating profile: " . $e->getMessage()];
         }
     }
 
