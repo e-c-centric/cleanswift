@@ -40,4 +40,13 @@ class driver_controller
             return "Error deleting driver: " . $e->getMessage();
         }
     }
+
+    public function get_profile_by_id($user_id)
+    {
+        try {
+            return $this->driver->get_profile_by_id($user_id);
+        } catch (Exception $e) {
+            return "Error getting profile: " . $e->getMessage();
+        }
+    }
 }

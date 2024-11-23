@@ -15,9 +15,11 @@ $user_name = $_SESSION['name'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Car</title>
+    <title>Me</title>
     <link rel="stylesheet" href="../css/dashboard.css">
-    <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="../fontawesome/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,7 +34,7 @@ $user_name = $_SESSION['name'];
 
         .sidebar {
             width: 250px;
-            background-color:rgb(51, 7, 100);
+            background-color: rgb(51, 7, 100);
             color: #fff;
             display: flex;
             flex-direction: column;
@@ -137,44 +139,136 @@ $user_name = $_SESSION['name'];
             transform: scale(1.1);
         }
 
-        .overview {
+        .profile-info {
             display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-
-        .card {
+            flex-direction: column;
+            align-items: center;
             background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
-            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .profile-info .info-item {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 1.1em;
+        }
+
+        .profile-info .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-info .info-item span {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .profile-info .info-item .label {
             flex: 1;
-            color: #333;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
         }
 
-        .card h3 {
-            margin-bottom: 10px;
+        .profile-info .info-item .value {
+            flex: 2;
+            text-align: right;
         }
 
-        .card p {
-            font-size: 1.2em;
-            margin: 0;
-        }
-
-        .charts {
+        .button-group {
+            display: flex;
+            gap: 10px;
             margin-top: 20px;
         }
 
-        .chart {
+        .edit-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 1em;
+        }
+
+        .edit-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
             background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
+            margin: 5% auto;
+            padding: 40px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .save-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .save-button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -199,8 +293,204 @@ $user_name = $_SESSION['name'];
 
         <main class="main-content">
             <header class="main-header">
-                <h1>My Car</h1>
+                <h1>My Vehicle</h1>
                 <div class="user-profile">
-                    <button class="user-profile-button">How far, <?php echo htmlspecialchars($user_name); ?>?</button>
+                    <button class="user-profile-button">Welcome, <?php echo htmlspecialchars($user_name); ?>!</button>
                 </div>
             </header>
+
+            <div class="profile-info">
+                <div class="info-item">
+                    <span class="label">Vehicle Number:</span>
+                    <span class="value" id="vehicleNumber">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Vehicle Type:</span>
+                    <span class="value" id="vehicleType">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Option Description:</span>
+                    <span class="value" id="optionDescription">Loading...</span>
+                </div>
+                <div class="button-group">
+                    <button class="edit-button" id="editProfile">Edit Vehicle</button>
+                </div>
+            </div>
+
+            <!-- Edit Vehicle Profile Modal -->
+            <div id="editProfileModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Edit Vehicle Profile</h2>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="vehicleNumberEdit">Vehicle Number</label>
+                            <input type="text" id="vehicleNumberEdit" name="vehicleNumber" value="" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleTypeEdit">Vehicle Type</label>
+                            <input type="text" id="vehicleTypeEdit" name="vehicleType" value="" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="optionDescriptionEdit">Option Description</label>
+                            <select id="optionDescriptionEdit" name="optionDescription" required>
+                                <option value="">Loading options...</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="save-button">Save</button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Function to fetch and display vehicle profile information
+            function loadVehicleProfile() {
+                $.ajax({
+                    url: '../actions/getDriverProfileInfo.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            var data = response.data;
+                            $('#vehicleNumber').text(data.vehicle_number);
+                            $('#vehicleType').text(data.vehicle_type);
+                            $('#optionDescription').text(data.option_description);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to fetch profile information.',
+                            text: error
+                        });
+                    }
+                });
+            }
+
+            // Call the function to load profile info on page load
+            loadVehicleProfile();
+
+            // Edit Profile Modal Functionality
+            var editProfileModal = document.getElementById('editProfileModal');
+
+            // When the user clicks the Edit Profile button, open the modal and load vehicle options
+            $('#editProfile').on('click', function() {
+                // Populate the input fields with current information
+                $('#vehicleNumberEdit').val($('#vehicleNumber').text());
+                $('#vehicleTypeEdit').val($('#vehicleType').text());
+
+                editProfileModal.style.display = "block";
+                loadVehicleOptions();
+            });
+
+            // When the user clicks on <span> (x), close the modal
+            $('.modal .close').on('click', function() {
+                $(this).closest('.modal').css('display', 'none');
+            });
+
+            // Function to load vehicle options and populate the dropdown
+            function loadVehicleOptions() {
+                $.ajax({
+                    url: '../actions/getVehicleOptions.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            var options = response.data;
+                            var select = $('#optionDescriptionEdit');
+                            select.empty(); // Clear existing options
+                            select.append('<option value="">Select an option</option>');
+                            $.each(options, function(index, option) {
+                                select.append('<option value="' + option.option_description + '">' + option.option_description + '</option>');
+                            });
+
+                            // Set the current option
+                            var currentOption = $('#optionDescription').text();
+                            select.val(currentOption);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to fetch vehicle options.',
+                            text: error
+                        });
+                    }
+                });
+            }
+
+            // When the user submits the Edit Profile form
+            $('#profileForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var vehicleNumber = $('#vehicleNumberEdit').val().trim();
+                var vehicleType = $('#vehicleTypeEdit').val().trim();
+                var optionDescription = $('#optionDescriptionEdit').val();
+
+                // Basic validation
+                if (!vehicleNumber || !vehicleType || !optionDescription) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'All fields are required.'
+                    });
+                    return;
+                }
+
+                // Send the updated profile data via AJAX
+                $.ajax({
+                    url: '../actions/updateDriverVehicle.php', // Ensure this endpoint exists
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        vehicle_number: vehicleNumber,
+                        vehicle_type: vehicleType,
+                        option_description: optionDescription
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: response.status === 'success' ? 'success' : 'error',
+                            title: response.message
+                        });
+                        if (response.status === 'success') {
+                            editProfileModal.style.display = "none";
+                            loadVehicleProfile(); // Refresh the profile info
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to update profile.',
+                            text: error
+                        });
+                    }
+                });
+            });
+
+            // Close modals when clicking outside of them
+            $(window).on('click', function(event) {
+                if ($(event.target).is(editProfileModal)) {
+                    editProfileModal.style.display = "none";
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

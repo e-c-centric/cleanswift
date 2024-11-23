@@ -330,7 +330,7 @@ $user_name = $_SESSION['name'];
                     <label for="deliveryOption">Delivery Option</label>
                     <select id="deliveryOption" name="deliveryOption" required>
                         <option value="" disabled selected>Select an option</option>
-                        <option value="pickup">Pickup</option>
+                        <option value="pickup">Drop off yourself</option>
                         <option value="delivery">Delivery</option>
                     </select>
                 </div>
@@ -361,7 +361,6 @@ $user_name = $_SESSION['name'];
                     <label for="vehicleType">Preferred Vehicle Type</label>
                     <select id="vehicleType" name="vehicleType" required>
                         <option value="" disabled selected>Select a vehicle type</option>
-                        <!-- Vehicle type options will be populated dynamically -->
                     </select>
                 </div>
                 <button type="submit" class="save-button">Confirm Delivery</button>
@@ -374,7 +373,6 @@ $user_name = $_SESSION['name'];
             loadServices();
             loadProviders();
 
-            // Search and Filter Functionality
             $('#search').on('input', function() {
                 var searchValue = $(this).val().toLowerCase();
                 filterServices(searchValue, $('#filter').val());
@@ -385,7 +383,6 @@ $user_name = $_SESSION['name'];
                 filterServices($('#search').val().toLowerCase(), filterValue);
             });
 
-            // Load Services via AJAX
             function loadServices() {
                 $.ajax({
                     url: '../actions/getServicesWithDetails.php',
@@ -431,7 +428,6 @@ $user_name = $_SESSION['name'];
                 });
             }
 
-            // Load Providers for Filtering via AJAX
             function loadProviders() {
                 $.ajax({
                     url: '../actions/getProviders.php',
@@ -460,7 +456,6 @@ $user_name = $_SESSION['name'];
                 });
             }
 
-            // Filter Services Based on Search and Provider
             function filterServices(searchValue, filterValue) {
                 $('#servicesList tr').filter(function() {
                     var serviceName = $(this).find('td:nth-child(1)').text().toLowerCase();
@@ -471,7 +466,6 @@ $user_name = $_SESSION['name'];
                 });
             }
 
-            // Attach Event Handlers to Request Buttons
             function attachRequestEventHandlers() {
                 $('.request-button').on('click', function() {
                     var serviceId = $(this).data('service-id');
@@ -489,17 +483,14 @@ $user_name = $_SESSION['name'];
                 });
             }
 
-            // Close Request Service Modal
             $('.close').on('click', function() {
                 $('#requestServiceModal').hide();
             });
 
-            // Close Delivery Details Modal
             $('.close-delivery').on('click', function() {
                 $('#deliveryDetailsModal').hide();
             });
 
-            // Close Modals When Clicking Outside
             $(window).on('click', function(event) {
                 if ($(event.target).is('#requestServiceModal')) {
                     $('#requestServiceModal').hide();
@@ -509,7 +500,6 @@ $user_name = $_SESSION['name'];
                 }
             });
 
-            // Handle Delivery Option Change in Request Service Form
             $('#deliveryOption').on('change', function() {
                 if ($(this).val() === 'delivery') {
                     $('#requestServiceModal').hide();
@@ -517,16 +507,13 @@ $user_name = $_SESSION['name'];
                 }
             });
 
-            // Handle Request Service Form Submission
             $('#requestServiceForm').on('submit', function(event) {
                 event.preventDefault();
 
                 if ($('#deliveryOption').val() === 'delivery') {
-                    // Show Delivery Details Modal
                     $('#requestServiceModal').hide();
                     $('#deliveryDetailsModal').show();
                 } else {
-                    // Add to Cart Without Delivery
                     var serviceId = $('#serviceId').val();
                     var quantity = $('#quantity').val();
                     var customerId = $('#customerId').val();
@@ -559,7 +546,6 @@ $user_name = $_SESSION['name'];
                 }
             });
 
-            // Handle Delivery Details Form Submission
             $('#deliveryDetailsForm').on('submit', function(event) {
                 event.preventDefault();
 
@@ -571,7 +557,6 @@ $user_name = $_SESSION['name'];
                 var dropoffTime = $('#dropoffTime').val();
                 var vehicleType = $('#vehicleType').val();
 
-                // Validate Delivery Details
                 if (!pickupTime || !dropoffTime || !vehicleType) {
                     Swal.fire({
                         icon: 'error',
@@ -580,7 +565,6 @@ $user_name = $_SESSION['name'];
                     return;
                 }
 
-                // Add to Cart with Delivery Option
                 $.ajax({
                     url: '../actions/addCartItem.php',
                     type: 'POST',
@@ -588,11 +572,10 @@ $user_name = $_SESSION['name'];
                     data: {
                         service_id: serviceId,
                         quantity: quantity,
-                        delivery_option: 'delivery' // Indicate delivery
+                        delivery_option: 'delivery'
                     },
                     success: function(response) {
                         if (response.status === 'success') {
-                            // Now, Request Delivery
                             $.ajax({
                                 url: '../actions/request_delivery.php',
                                 type: 'POST',
@@ -637,7 +620,6 @@ $user_name = $_SESSION['name'];
                 });
             });
 
-            // Load Vehicle Types via AJAX
             function loadVehicleTypes() {
                 $.ajax({
                     url: '../actions/getVehicleOptions.php',
@@ -663,7 +645,6 @@ $user_name = $_SESSION['name'];
                 });
             }
 
-            // Initialize Vehicle Types on Page Load
             loadVehicleTypes();
         });
     </script>

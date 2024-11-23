@@ -19,6 +19,7 @@ $user_name = $_SESSION['name'];
     <link rel="stylesheet" href="../css/dashboard.css">
     <link rel="stylesheet" href="../fontawesome/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -452,6 +453,60 @@ $user_name = $_SESSION['name'];
                     changePasswordModal.style.display = "none";
                 }
             }
+
+            $('#passwordForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var oldPassword = $('#oldPassword').val().trim();
+                var newPassword = $('#newPassword').val().trim();
+                var confirmPassword = $('#confirmPassword').val().trim();
+
+                // Basic validation
+                if (!oldPassword || !newPassword || !confirmPassword) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'All fields are required.'
+                    });
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'New passwords do not match.'
+                    });
+                    return;
+                }
+
+                $.ajax({
+                    url: '../actions/changePassword.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        old_password: oldPassword,
+                        new_password: newPassword
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: response.status === 'success' ? 'success' : 'error',
+                            title: response.message
+                        });
+                        if (response.status === 'success') {
+                            changePasswordModal.style.display = "none";
+                            $('#passwordForm')[0].reset(); // Reset the form
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to change password.',
+                            text: error
+                        });
+                    }
+                });
+            });
         });
     </script>
 </body>

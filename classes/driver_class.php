@@ -108,4 +108,17 @@ class driver_class extends db_connection
             throw $e;
         }
     }
+
+    public function get_profile_by_id($user_id)
+    {
+        $user_id = mysqli_real_escape_string($this->db_conn(), $user_id);
+
+        $sql = "SELECT u.user_id, u.user_name, u.user_email, u.user_contact, d.license_number, v.vehicle_number, v.vehicle_type, vo.option_description 
+                FROM users u 
+                JOIN drivers d ON u.user_id = d.driver_id 
+                JOIN vehicles v ON d.vehicle_id = v.vehicle_id 
+                JOIN vehicle_options vo ON vo.option_id = v.vehicle_class 
+                WHERE u.user_id = '$user_id'";
+        return $this->db_fetch_one($sql);
+    }
 }

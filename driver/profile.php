@@ -17,7 +17,9 @@ $user_name = $_SESSION['name'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Me</title>
     <link rel="stylesheet" href="../css/dashboard.css">
-    <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="../fontawesome/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,7 +34,7 @@ $user_name = $_SESSION['name'];
 
         .sidebar {
             width: 250px;
-            background-color:rgb(51, 7, 100);
+            background-color: rgb(51, 7, 100);
             color: #fff;
             display: flex;
             flex-direction: column;
@@ -137,44 +139,136 @@ $user_name = $_SESSION['name'];
             transform: scale(1.1);
         }
 
-        .overview {
+        .profile-info {
             display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-
-        .card {
+            flex-direction: column;
+            align-items: center;
             background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
-            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .profile-info .info-item {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 1.1em;
+        }
+
+        .profile-info .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-info .info-item span {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .profile-info .info-item .label {
             flex: 1;
-            color: #333;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
         }
 
-        .card h3 {
-            margin-bottom: 10px;
+        .profile-info .info-item .value {
+            flex: 2;
+            text-align: right;
         }
 
-        .card p {
-            font-size: 1.2em;
-            margin: 0;
-        }
-
-        .charts {
+        .button-group {
+            display: flex;
+            gap: 10px;
             margin-top: 20px;
         }
 
-        .chart {
+        .edit-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 1em;
+        }
+
+        .edit-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
             background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
+            margin: 5% auto;
+            padding: 40px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .save-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .save-button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -204,3 +298,251 @@ $user_name = $_SESSION['name'];
                     <button class="user-profile-button">Heyy, <?php echo htmlspecialchars($user_name); ?></button>
                 </div>
             </header>
+
+            <div class="profile-info">
+                <div class="info-item">
+                    <span class="label">Username:</span>
+                    <span class="value" id="username">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Email:</span>
+                    <span class="value" id="email">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Contact:</span>
+                    <span class="value" id="contact">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">License Number:</span>
+                    <span class="value" id="licenseNumber">Loading...</span>
+                </div>
+                <div class="button-group">
+                    <button class="edit-button" id="editProfile">Edit Profile</button>
+                    <button class="edit-button" id="changePassword">Change Password</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Profile</h2>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="usernameEdit">Username</label>
+                    <input type="text" id="usernameEdit" name="username" value="">
+                </div>
+                <div class="form-group">
+                    <label for="emailEdit">Email</label>
+                    <input type="email" id="emailEdit" name="email" value="">
+                </div>
+                <div class="form-group">
+                    <label for="contactEdit">Contact</label>
+                    <input type="text" id="contactEdit" name="contact" value="">
+                </div>
+                <div class="form-group">
+                    <label for="licenseNumberEdit">License Number</label>
+                    <input type="text" id="licenseNumberEdit" name="licenseNumber" value="">
+                </div>
+                <button type="submit" class="save-button">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Change Password</h2>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="oldPassword">Old Password</label>
+                    <input type="password" id="oldPassword" name="oldPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit" class="save-button">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            function loadDriverProfile() {
+                $.ajax({
+                    url: '../actions/getDriverProfileInfo.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            var data = response.data;
+                            $('#username').text(data.user_name);
+                            $('#email').text(data.user_email);
+                            $('#contact').text(data.user_contact);
+                            $('#licenseNumber').text(data.license_number);
+
+                            $('#usernameEdit').val(data.user_name);
+                            $('#emailEdit').val(data.user_email);
+                            $('#contactEdit').val(data.user_contact);
+                            $('#licenseNumberEdit').val(data.license_number);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to fetch profile information.',
+                            text: error
+                        });
+                    }
+                });
+            }
+
+            loadDriverProfile();
+
+            var editProfileModal = document.getElementById('editProfileModal');
+
+            $('#editProfile').on('click', function() {
+                editProfileModal.style.display = "block";
+            });
+
+            $('#editProfileModal .close').on('click', function() {
+                editProfileModal.style.display = "none";
+            });
+
+            $('#profileForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var username = $('#usernameEdit').val().trim();
+                var email = $('#emailEdit').val().trim();
+                var contact = $('#contactEdit').val().trim();
+                var licenseNumber = $('#licenseNumberEdit').val().trim();
+
+                if (!username || !email || !contact || !licenseNumber) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'All fields are required.'
+                    });
+                    return;
+                }
+
+                $.ajax({
+                    url: '../actions/updateDriverProfile.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        username: username,
+                        email: email,
+                        contact: contact,
+                        license_number: licenseNumber
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: response.status === 'success' ? 'success' : 'error',
+                            title: response.message
+                        });
+                        if (response.status === 'success') {
+                            editProfileModal.style.display = "none";
+                            loadDriverProfile(); 
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to update profile.',
+                            text: error
+                        });
+                    }
+                });
+            });
+
+            var changePasswordModal = document.getElementById('changePasswordModal');
+
+            $('#changePassword').on('click', function() {
+                changePasswordModal.style.display = "block";
+            });
+
+            $('#changePasswordModal .close').on('click', function() {
+                changePasswordModal.style.display = "none";
+            });
+
+            $('#passwordForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var oldPassword = $('#oldPassword').val().trim();
+                var newPassword = $('#newPassword').val().trim();
+                var confirmPassword = $('#confirmPassword').val().trim();
+
+                if (!oldPassword || !newPassword || !confirmPassword) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'All fields are required.'
+                    });
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'New passwords do not match.'
+                    });
+                    return;
+                }
+
+                $.ajax({
+                    url: '../actions/changePassword.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        old_password: oldPassword,
+                        new_password: newPassword
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: response.status === 'success' ? 'success' : 'error',
+                            title: response.message
+                        });
+                        if (response.status === 'success') {
+                            changePasswordModal.style.display = "none";
+                            $('#passwordForm')[0].reset();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to change password.',
+                            text: error
+                        });
+                    }
+                });
+            });
+
+            $(window).on('click', function(event) {
+                if ($(event.target).is(editProfileModal)) {
+                    editProfileModal.style.display = "none";
+                }
+                if ($(event.target).is(changePasswordModal)) {
+                    changePasswordModal.style.display = "none";
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

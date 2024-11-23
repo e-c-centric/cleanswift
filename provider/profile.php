@@ -17,7 +17,9 @@ $user_name = $_SESSION['name'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile</title>
     <link rel="stylesheet" href="../css/dashboard.css">
-    <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="../fontawesome/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -298,19 +300,19 @@ $user_name = $_SESSION['name'];
             <div class="profile-info">
                 <div class="info-item">
                     <span class="label">Provider Name:</span>
-                    <span class="value">Laundry Provider</span>
+                    <span class="value" id="providerName">Loading...</span>
                 </div>
                 <div class="info-item">
                     <span class="label">Address:</span>
-                    <span class="value">123 Main St</span>
+                    <span class="value" id="providerAddress">Loading...</span>
                 </div>
                 <div class="info-item">
                     <span class="label">Manager's Name:</span>
-                    <span class="value">John Doe</span>
+                    <span class="value" id="managerName">Loading...</span>
                 </div>
                 <div class="info-item">
                     <span class="label">Contact:</span>
-                    <span class="value">+1234567890</span>
+                    <span class="value" id="contact">Loading...</span>
                 </div>
                 <div class="button-group">
                     <button class="edit-button" id="editProfile">Edit Profile</button>
@@ -327,20 +329,20 @@ $user_name = $_SESSION['name'];
             <h2>Edit Profile</h2>
             <form id="profileForm">
                 <div class="form-group">
-                    <label for="providerName">Provider Name</label>
-                    <input type="text" id="providerName" name="providerName" value="Laundry Provider">
+                    <label for="providerNameEdit">Provider Name</label>
+                    <input type="text" id="providerNameEdit" name="providerName" value="">
                 </div>
                 <div class="form-group">
-                    <label for="address">Address</label>
-                    <input type="text" id="address" name="address" value="123 Main St">
+                    <label for="addressEdit">Address</label>
+                    <input type="text" id="addressEdit" name="address" value="">
                 </div>
                 <div class="form-group">
-                    <label for="managerName">Manager's Name</label>
-                    <input type="text" id="managerName" name="managerName" value="John Doe">
+                    <label for="managerNameEdit">Manager's Name</label>
+                    <input type="text" id="managerNameEdit" name="managerName" value="">
                 </div>
                 <div class="form-group">
-                    <label for="contact">Contact</label>
-                    <input type="text" id="contact" name="contact" value="+1234567890">
+                    <label for="contactEdit">Contact</label>
+                    <input type="text" id="contactEdit" name="contact" value="">
                 </div>
                 <button type="submit" class="save-button">Save</button>
             </form>
@@ -371,42 +373,188 @@ $user_name = $_SESSION['name'];
     </div>
 
     <script>
-        // Get the modals
-        var editProfileModal = document.getElementById('editProfileModal');
-        var changePasswordModal = document.getElementById('changePasswordModal');
+        $(document).ready(function() {
+            // Function to fetch and display provider profile information
+            function loadProviderProfile() {
+                $.ajax({
+                    url: '../actions/getProviderProfileInfo.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            var data = response.data;
+                            $('#providerName').text(data.provider_name);
+                            $('#providerAddress').text(data.provider_address);
+                            $('#managerName').text(data.user_name);
+                            $('#contact').text(data.user_contact);
 
-        // Get the buttons that open the modals
-        var editProfileBtn = document.getElementById('editProfile');
-        var changePasswordBtn = document.getElementById('changePassword');
-
-        // Get the <span> elements that close the modals
-        var spans = document.querySelectorAll('.close');
-
-        // When the user clicks the button, open the modal
-        editProfileBtn.onclick = function() {
-            editProfileModal.style.display = "block";
-        }
-        changePasswordBtn.onclick = function() {
-            changePasswordModal.style.display = "block";
-        }
-
-        // When the user clicks on <span> (x), close the modal
-        spans.forEach(span => {
-            span.onclick = function() {
-                editProfileModal.style.display = "none";
-                changePasswordModal.style.display = "none";
+                            // Also, populate the Edit Profile form fields
+                            $('#providerNameEdit').val(data.provider_name);
+                            $('#addressEdit').val(data.provider_address);
+                            $('#managerNameEdit').val(data.user_name);
+                            $('#contactEdit').val(data.user_contact);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to fetch profile information.',
+                            text: error
+                        });
+                    }
+                });
             }
+
+            // Call the function to load profile info on page load
+            loadProviderProfile();
+
+            // Edit Profile Modal Functionality
+            var editProfileModal = document.getElementById('editProfileModal');
+
+            // When the user clicks the Edit Profile button, open the modal
+            $('#editProfile').on('click', function() {
+                editProfileModal.style.display = "block";
+            });
+
+            // When the user clicks on <span> (x), close the modal
+            $('#editProfileModal .close').on('click', function() {
+                editProfileModal.style.display = "none";
+            });
+
+            // When the user submits the Edit Profile form
+            $('#profileForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var providerName = $('#providerNameEdit').val().trim();
+                var address = $('#addressEdit').val().trim();
+                var managerName = $('#managerNameEdit').val().trim();
+                var contact = $('#contactEdit').val().trim();
+
+                // Basic validation
+                if (!providerName || !address || !managerName || !contact) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'All fields are required.'
+                    });
+                    return;
+                }
+
+                // Send the updated profile data via AJAX
+                $.ajax({
+                    url: '../actions/updateProviderProfile.php', // Ensure this endpoint exists
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        provider_name: providerName,
+                        provider_address: address,
+                        manager_name: managerName,
+                        contact: contact
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: response.status === 'success' ? 'success' : 'error',
+                            title: response.message
+                        });
+                        if (response.status === 'success') {
+                            editProfileModal.style.display = "none";
+                            loadProviderProfile(); // Refresh the profile info
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to update profile.',
+                            text: error
+                        });
+                    }
+                });
+            });
+
+            // Change Password Modal Functionality
+            var changePasswordModal = document.getElementById('changePasswordModal');
+
+            // When the user clicks the Change Password button, open the modal
+            $('#changePassword').on('click', function() {
+                changePasswordModal.style.display = "block";
+            });
+
+            // When the user clicks on <span> (x), close the modal
+            $('#changePasswordModal .close').on('click', function() {
+                changePasswordModal.style.display = "none";
+            });
+
+            // When the user submits the Change Password form
+            $('#passwordForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var oldPassword = $('#oldPassword').val().trim();
+                var newPassword = $('#newPassword').val().trim();
+                var confirmPassword = $('#confirmPassword').val().trim();
+
+                // Basic validation
+                if (!oldPassword || !newPassword || !confirmPassword) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'All fields are required.'
+                    });
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'New passwords do not match.'
+                    });
+                    return;
+                }
+
+                $.ajax({
+                    url: '../actions/changePassword.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        old_password: oldPassword,
+                        new_password: newPassword
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: response.status === 'success' ? 'success' : 'error',
+                            title: response.message
+                        });
+                        if (response.status === 'success') {
+                            changePasswordModal.style.display = "none";
+                            $('#passwordForm')[0].reset(); // Reset the form
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to change password.',
+                            text: error
+                        });
+                    }
+                });
+            });
+
+            // Close modals when clicking outside of them
+            $(window).on('click', function(event) {
+                if ($(event.target).is(editProfileModal)) {
+                    editProfileModal.style.display = "none";
+                }
+                if ($(event.target).is(changePasswordModal)) {
+                    changePasswordModal.style.display = "none";
+                }
+            });
         });
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == editProfileModal) {
-                editProfileModal.style.display = "none";
-            }
-            if (event.target == changePasswordModal) {
-                changePasswordModal.style.display = "none";
-            }
-        }
     </script>
 </body>
 

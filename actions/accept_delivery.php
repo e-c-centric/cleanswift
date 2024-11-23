@@ -2,7 +2,6 @@
 header('Content-Type: application/json');
 require_once("../controllers/delivery_controller.php");
 
-// Check if required POST parameters are set
 if (isset($_POST['delivery_id'], $_POST['driver_id'], $_POST['cost'])) {
     $delivery_id = $_POST['delivery_id'];
     $driver_id = $_POST['driver_id'];

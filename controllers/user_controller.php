@@ -24,4 +24,18 @@ class user_controller
             return "Error logging in: " . $e->getMessage();
         }
     }
+
+    public function change_password($user_id, $old_password, $new_password)
+    {
+        try {
+            $result = $this->user->change_password($user_id, $old_password, $new_password);
+            if ($result) {
+                return "Password changed successfully.";
+            } else {
+                return "Failed to change password.";
+            }
+        } catch (Exception $e) {
+            return "Error changing password: " . $e->getMessage();
+        }
+    }
 }
