@@ -99,7 +99,25 @@ class provider_class extends db_connection
     //-- Get All Providers --//
     public function get_all_providers()
     {
-        $sql = "SELECT * FROM providers JOIN users ON providers.provider_id = users.user_id";
+        $sql = "SELECT 
+                v.user_id, 
+                v.user_name, 
+                v.user_email, 
+                v.user_contact, 
+                p.provider_id,
+                p.provider_name, 
+                p.provider_address, 
+                GROUP_CONCAT(s.service_name ORDER BY s.service_name SEPARATOR ', ') AS services
+            FROM 
+                users v 
+            JOIN 
+                providers p ON v.user_id = p.provider_id 
+            JOIN 
+                services s ON p.provider_id = s.provider_id
+            GROUP BY 
+                p.provider_id, v.user_id, v.user_name, v.user_email, v.user_contact, 
+                p.provider_name, p.provider_address";
+
         return $this->db_fetch_all($sql);
     }
 }

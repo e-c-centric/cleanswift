@@ -319,6 +319,46 @@ $user_name = $_SESSION['name'];
             text-decoration: none;
             cursor: pointer;
         }
+
+
+        /* Additional Modal Styling for Delivery Options */
+        .delivery-modal {
+            display: none;
+            position: fixed;
+            z-index: 2;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .delivery-modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .delivery-option-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .delivery-option-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 
@@ -391,14 +431,179 @@ $user_name = $_SESSION['name'];
         </div>
     </div>
 
+    <div id="deliveryOptionsModal" class="delivery-modal">
+        <div class="delivery-modal-content">
+            <h2>Select Delivery Option</h2>
+            <button class="delivery-option-button" id="no_delivery">Drop Off Yourself</button>
+            <button class="delivery-option-button" id="delivery">Delivery</button>
+        </div>
+    </div>
+
+    <!-- Delivery Details Modal -->
+    <div id="deliveryDetailsModal" class="modal" role="dialog" aria-labelledby="deliveryDetailsTitle" aria-modal="true" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-content" style="background-color: #fff; margin: 5% auto; padding: 30px 40px; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 8px; position: relative;">
+            <span class="close" style="color: #aaa; position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer;" aria-label="Close">&times;</span>
+            <h2 id="deliveryDetailsTitle" style="text-align: center; margin-bottom: 20px; color: #333;">Delivery Details</h2>
+            <form id="deliveryDetailsForm" style="display: flex; flex-direction: column;">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="pickupTime" style="font-weight: bold; display: block; margin-bottom: 5px; color: #555;">Pickup Time</label>
+                    <input type="datetime-local" id="pickupTime" name="pickupTime" required aria-required="true" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" aria-describedby="pickupTimeHelp">
+                    <small id="pickupTimeHelp" style="color: #e74c3c; display: none;">Please enter a valid pickup time.</small>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="dropoffTime" style="font-weight: bold; display: block; margin-bottom: 5px; color: #555;">Dropoff Time</label>
+                    <input type="datetime-local" id="dropoffTime" name="dropoffTime" required aria-required="true" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" aria-describedby="dropoffTimeHelp">
+                    <small id="dropoffTimeHelp" style="color: #e74c3c; display: none;">Please enter a valid dropoff time.</small>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="vehicleType" style="font-weight: bold; display: block; margin-bottom: 5px; color: #555;">Vehicle Type</label>
+                    <select id="vehicleType" name="vehicleType" required aria-required="true" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;" aria-describedby="vehicleTypeHelp">
+                        <option value="" disabled selected style="color: #999;">Select a vehicle type</option>
+                        <!-- Options will be loaded dynamically -->
+                    </select>
+                    <small id="vehicleTypeHelp" style="color: #e74c3c; display: none;">Please select a vehicle type.</small>
+                </div>
+                <button type="submit" class="save-button" style="background-color: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s;"
+                    onmouseover="this.style.backgroundColor='#0056b3';"
+                    onmouseout="this.style.backgroundColor='#007bff';">Confirm Delivery</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function() {
             loadCartItems();
 
+            // Handle Checkout Button Click
+            $('#checkoutButton').on('click', function() {
+                $('#deliveryOptionsModal').show();
+            });
+
+            // Handle Delivery Option: Delivery
+            $('#delivery').on('click', function() {
+                $('#deliveryOptionsModal').hide();
+                $('#deliveryDetailsModal').show();
+            });
+
+            // Handle Delivery Option: No Delivery
+            // Handle Delivery Option: No Delivery
+            $('#no_delivery').on('click', function() {
+                $('#deliveryOptionsModal').hide();
+                proceedToCheckout('no_delivery');
+            });
+
+            // Handle Delivery Details Form Submission
+            $('#deliveryDetailsForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var pickupTime = $('#pickupTime').val();
+                var dropoffTime = $('#dropoffTime').val();
+                var vehicleType = $('#vehicleType').val();
+
+                if (!pickupTime || !dropoffTime || !vehicleType) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Please fill in all delivery details.'
+                    });
+                    return;
+                }
+
+                proceedToCheckout('delivery', {
+                    pickup_time: pickupTime,
+                    dropoff_time: dropoffTime,
+                    vehicle_type: vehicleType
+                });
+
+                $('#deliveryDetailsModal').hide();
+            });
+
+            // Function to Proceed to Checkout
+            function proceedToCheckout(option, deliveryData = {}) {
+                var providerIds = [];
+
+                // Collect unique provider IDs from quantity inputs
+                $('.quantity-input').each(function() {
+                    var providerId = $(this).data('provider-id');
+                    if (providerId && !providerIds.includes(providerId)) {
+                        providerIds.push(providerId);
+                    }
+                });
+
+                console.log('Collected Provider IDs:', providerIds); // Debugging Statement
+
+                if (option === 'delivery') {
+                    // Process Delivery
+                    var deliveryPayload = {
+                        pickup_time: deliveryData.pickup_time,
+                        dropoff_time: deliveryData.dropoff_time,
+                        vehicle_type: deliveryData.vehicle_type,
+                        provider_id: providerIds
+                    };
+
+                    $.ajax({
+                        url: '../actions/request_delivery.php',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: deliveryPayload,
+                        success: function(response) {
+                            Swal.fire({
+                                icon: response.status === 'success' ? 'success' : 'error',
+                                title: response.message
+                            });
+                            if (response.status === 'success') {
+                                // Proceed to Place Order
+                                placeOrder(providerIds);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Delivery Request Failed',
+                                text: error
+                            });
+                        }
+                    });
+                } else if (option === 'no_delivery') {
+                    placeOrder(providerIds);
+                }
+            }
+
+            // Function to Place Order
+            function placeOrder(providerIds) {
+                var orderPayload = {
+                    provider_id: providerIds
+                };
+
+                $.ajax({
+                    url: '../actions/placeOrder.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: orderPayload,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: response.status === 'success' ? 'success' : 'error',
+                            title: response.message
+                        });
+                        if (response.status === 'success') {
+                            window.location.href = 'cart.php';
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Order Placement Failed',
+                            text: error
+                        });
+                    }
+                });
+            }
+
+            // Function to Load Cart Items
             function loadCartItems() {
                 $.ajax({
                     url: '../actions/getCartByCustomer.php',
                     type: 'GET',
+                    dataType: 'json',
                     success: function(response) {
                         if (response.status === 'success') {
                             var cartItems = $('#cartItems');
@@ -407,21 +612,34 @@ $user_name = $_SESSION['name'];
                             response.data.forEach(function(item) {
                                 var itemTotal = item.price * item.quantity;
                                 cartItems.append(`
-                                    <tr>
-                                        <td>${item.service_name}</td>
-                                        <td><a href="#" class="provider-link" data-provider-name="${item.provider_name}" data-provider-address="${item.provider_address}">${item.provider_name}</a></td>
-                                        <td>$${parseFloat(item.price).toFixed(2)}</td>
-                                        <td>
-                                            <input type="number" class="quantity-input" value="${item.quantity}" data-service-id="${item.service_id}">
-                                        </td>
-                                        <td>$${itemTotal.toFixed(2)}</td>
-                                        <td>${item.added_at}</td>
-                                        <td class="action-buttons">
-                                            <button class="update-button btn-primary" data-service-id="${item.service_id}"><i class="fas fa-sync-alt"></i></button>
-                                            <button class="delete-button btn-danger" data-service-id="${item.service_id}"><i class="fas fa-trash-alt"></i></button>
-                                        </td>
-                                    </tr>
-                                `);
+                                <tr>
+                                    <td>${item.service_name}</td>
+                                    <td>
+                                        <a href="#" class="provider-link" 
+                                           data-provider-name="${item.provider_name}" 
+                                           data-provider-address="${item.provider_address}" 
+                                           data-provider-id="${item.provider_id}">
+                                           ${item.provider_name}
+                                        </a>
+                                    </td>
+                                    <td>$${parseFloat(item.price).toFixed(2)}</td>
+                                    <td>
+                                        <input type="number" class="quantity-input" value="${item.quantity}" 
+                                               data-service-id="${item.service_id}" 
+                                               data-provider-id="${item.provider_id}" min="1">
+                                    </td>
+                                    <td>$${itemTotal.toFixed(2)}</td>
+                                    <td>${item.added_at}</td>
+                                    <td class="action-buttons">
+                                        <button class="update-button btn-primary" data-service-id="${item.service_id}">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                        <button class="delete-button btn-danger" data-service-id="${item.service_id}">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
                                 totalCost += itemTotal;
                             });
                             $('#totalCost').text('Total Cost: $' + totalCost.toFixed(2));
@@ -434,14 +652,24 @@ $user_name = $_SESSION['name'];
                             $('#checkoutButton').hide();
                             $('#emptyCartMessage').show();
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed to load cart items.',
+                            text: error
+                        });
                     }
                 });
             }
 
+            // Function to Attach Event Handlers
             function attachEventHandlers() {
+                // Update Quantity
                 $('.update-button').on('click', function() {
                     var serviceId = $(this).data('service-id');
                     var quantity = $(this).closest('tr').find('.quantity-input').val();
+
                     $.ajax({
                         url: '../actions/updateCartItem.php',
                         type: 'POST',
@@ -449,6 +677,7 @@ $user_name = $_SESSION['name'];
                             service_id: serviceId,
                             quantity: quantity
                         },
+                        dataType: 'json',
                         success: function(response) {
                             Swal.fire({
                                 icon: response.status === 'success' ? 'success' : 'error',
@@ -457,30 +686,58 @@ $user_name = $_SESSION['name'];
                             if (response.status === 'success') {
                                 loadCartItems();
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Update Failed',
+                                text: error
+                            });
                         }
                     });
                 });
 
+                // Delete Cart Item
                 $('.delete-button').on('click', function() {
                     var serviceId = $(this).data('service-id');
-                    $.ajax({
-                        url: '../actions/deleteCartItem.php',
-                        type: 'POST',
-                        data: {
-                            service_id: serviceId
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: response.status === 'success' ? 'success' : 'error',
-                                title: response.message
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "Do you really want to remove this item from your cart?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, remove it!',
+                        cancelButtonText: 'No, keep it'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '../actions/deleteCartItem.php',
+                                type: 'POST',
+                                data: {
+                                    service_id: serviceId
+                                },
+                                dataType: 'json',
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: response.status === 'success' ? 'success' : 'error',
+                                        title: response.message
+                                    });
+                                    if (response.status === 'success') {
+                                        loadCartItems();
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Deletion Failed',
+                                        text: error
+                                    });
+                                }
                             });
-                            if (response.status === 'success') {
-                                loadCartItems();
-                            }
                         }
                     });
                 });
 
+                // Provider Details
                 $('.provider-link').on('click', function(event) {
                     event.preventDefault();
                     var providerName = $(this).data('provider-name');
@@ -489,15 +746,7 @@ $user_name = $_SESSION['name'];
                     $('#providerModal').show();
                 });
 
-                $('.close').on('click', function() {
-                    $('#providerModal').hide();
-                });
-
-                $(window).on('click', function(event) {
-                    if ($(event.target).is('#providerModal')) {
-                        $('#providerModal').hide();
-                    }
-                });
+                // Empty Cart
                 $('#emptyCartButton').on('click', function() {
                     Swal.fire({
                         title: 'Are you sure?',
@@ -525,6 +774,7 @@ $user_name = $_SESSION['name'];
                                     $.ajax({
                                         url: '../actions/clearCart.php',
                                         type: 'POST',
+                                        dataType: 'json',
                                         success: function(response) {
                                             Swal.fire({
                                                 icon: response.status === 'success' ? 'success' : 'error',
@@ -533,6 +783,13 @@ $user_name = $_SESSION['name'];
                                             if (response.status === 'success') {
                                                 loadCartItems();
                                             }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Failed to empty cart.',
+                                                text: error
+                                            });
                                         }
                                     });
                                 }
@@ -540,6 +797,47 @@ $user_name = $_SESSION['name'];
                         }
                     });
                 });
+            }
+
+            // Close Modals When Clicking on <span> (x)
+            $('.close').on('click', function() {
+                $('.modal').hide();
+            });
+
+            // Close Modals When Clicking Outside of Modal Content
+            window.onclick = function(event) {
+                if ($(event.target).hasClass('modal')) {
+                    $('.modal').hide();
+                }
+            };
+
+            $.ajax({
+                url: '../actions/getVehicleOptions.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        var vehicleTypeSelect = $('#vehicleType');
+                        vehicleTypeSelect.empty();
+                        response.data.forEach(function(vehicleType) {
+                            vehicleTypeSelect.append(`<option value="${vehicleType.option_id}">${vehicleType.option_description}</option>`);
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to load vehicle options:', error);
+                }
+            });
+
+        });
+
+        // Accessibility: Close Delivery Details Modal with Escape Key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('deliveryDetailsModal');
+                if (modal.style.display === 'block') {
+                    modal.style.display = 'none';
+                }
             }
         });
     </script>

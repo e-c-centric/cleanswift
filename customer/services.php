@@ -326,44 +326,11 @@ $user_name = $_SESSION['name'];
                     <label for="quantity">Quantity</label>
                     <input type="number" id="quantity" name="quantity" required min="1" value="1">
                 </div>
-                <div class="form-group">
-                    <label for="deliveryOption">Delivery Option</label>
-                    <select id="deliveryOption" name="deliveryOption" required>
-                        <option value="" disabled selected>Select an option</option>
-                        <option value="pickup">Drop off yourself</option>
-                        <option value="delivery">Delivery</option>
-                    </select>
-                </div>
                 <!-- Hidden Inputs -->
                 <input type="hidden" id="serviceId" name="serviceId">
                 <input type="hidden" id="providerId" name="providerId">
                 <input type="hidden" id="customerId" name="customerId" value="<?php echo $_SESSION['user_id']; ?>">
                 <button type="submit" class="save-button">Add to Cart</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Delivery Details Modal -->
-    <div id="deliveryDetailsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-delivery">&times;</span>
-            <h2>Delivery Details</h2>
-            <form id="deliveryDetailsForm">
-                <div class="form-group">
-                    <label for="pickupTime">Pickup Time</label>
-                    <input type="datetime-local" id="pickupTime" name="pickupTime" required>
-                </div>
-                <div class="form-group">
-                    <label for="dropoffTime">Drop-off Time</label>
-                    <input type="datetime-local" id="dropoffTime" name="dropoffTime" required>
-                </div>
-                <div class="form-group">
-                    <label for="vehicleType">Preferred Vehicle Type</label>
-                    <select id="vehicleType" name="vehicleType" required>
-                        <option value="" disabled selected>Select a vehicle type</option>
-                    </select>
-                </div>
-                <button type="submit" class="save-button">Confirm Delivery</button>
             </form>
         </div>
     </div>
@@ -500,70 +467,11 @@ $user_name = $_SESSION['name'];
                 }
             });
 
-            $('#deliveryOption').on('change', function() {
-                if ($(this).val() === 'delivery') {
-                    $('#requestServiceModal').hide();
-                    $('#deliveryDetailsModal').show();
-                }
-            });
-
             $('#requestServiceForm').on('submit', function(event) {
                 event.preventDefault();
-
-                if ($('#deliveryOption').val() === 'delivery') {
-                    $('#requestServiceModal').hide();
-                    $('#deliveryDetailsModal').show();
-                } else {
-                    var serviceId = $('#serviceId').val();
-                    var quantity = $('#quantity').val();
-                    var customerId = $('#customerId').val();
-
-                    $.ajax({
-                        url: '../actions/addCartItem.php',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            service_id: serviceId,
-                            quantity: quantity
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: response.status === 'success' ? 'success' : 'error',
-                                title: response.message
-                            });
-                            if (response.status === 'success') {
-                                $('#requestServiceModal').hide();
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Failed to add to cart.',
-                                text: error
-                            });
-                        }
-                    });
-                }
-            });
-
-            $('#deliveryDetailsForm').on('submit', function(event) {
-                event.preventDefault();
-
                 var serviceId = $('#serviceId').val();
-                var providerId = $('#providerId').val();
-                var customerId = $('#customerId').val();
                 var quantity = $('#quantity').val();
-                var pickupTime = $('#pickupTime').val();
-                var dropoffTime = $('#dropoffTime').val();
-                var vehicleType = $('#vehicleType').val();
-
-                if (!pickupTime || !dropoffTime || !vehicleType) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Please fill in all delivery details.'
-                    });
-                    return;
-                }
+                var customerId = $('#customerId').val();
 
                 $.ajax({
                     url: '../actions/addCartItem.php',
@@ -571,43 +479,15 @@ $user_name = $_SESSION['name'];
                     dataType: 'json',
                     data: {
                         service_id: serviceId,
-                        quantity: quantity,
-                        delivery_option: 'delivery'
+                        quantity: quantity
                     },
                     success: function(response) {
+                        Swal.fire({
+                            icon: response.status === 'success' ? 'success' : 'error',
+                            title: response.message
+                        });
                         if (response.status === 'success') {
-                            $.ajax({
-                                url: '../actions/request_delivery.php',
-                                type: 'POST',
-                                dataType: 'json',
-                                data: {
-                                    customer_id: customerId,
-                                    provider_id: providerId,
-                                    pickup_time: pickupTime,
-                                    dropoff_time: dropoffTime
-                                },
-                                success: function(deliveryResponse) {
-                                    Swal.fire({
-                                        icon: deliveryResponse.status === 'success' ? 'success' : 'error',
-                                        title: deliveryResponse.message
-                                    });
-                                    if (deliveryResponse.status === 'success') {
-                                        $('#deliveryDetailsModal').hide();
-                                    }
-                                },
-                                error: function(xhr, status, error) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Failed to request delivery.',
-                                        text: error
-                                    });
-                                }
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: response.message
-                            });
+                            $('#requestServiceModal').hide();
                         }
                     },
                     error: function(xhr, status, error) {
@@ -619,33 +499,6 @@ $user_name = $_SESSION['name'];
                     }
                 });
             });
-
-            function loadVehicleTypes() {
-                $.ajax({
-                    url: '../actions/getVehicleOptions.php',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(data) {
-                        if (data.status === 'success') {
-                            data.data.forEach(function(vehicle) {
-                                $('#vehicleType').append(
-                                    $('<option>', {
-                                        value: vehicle.option_id,
-                                        text: vehicle.option_description
-                                    })
-                                );
-                            });
-                        } else {
-                            console.error('Failed to load vehicle types:', data.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('AJAX error:', status, error);
-                    }
-                });
-            }
-
-            loadVehicleTypes();
         });
     </script>
 </body>

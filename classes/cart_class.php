@@ -35,7 +35,7 @@ class cart_class extends db_connection
     {
         $ndb = new db_connection();
         $customer_id = mysqli_real_escape_string($ndb->db_conn(), $customer_id);
-        $sql = "SELECT c.service_id, s.service_name, p.provider_name, p.provider_address, c.quantity, c.added_at, s.price
+        $sql = "SELECT c.service_id, s.service_name, p.provider_name, p.provider_id, p.provider_address, c.quantity, c.added_at, s.price
                 FROM `cart` c 
                 JOIN `services` s ON c.service_id = s.service_id 
                 JOIN `providers` p ON s.provider_id = p.provider_id 

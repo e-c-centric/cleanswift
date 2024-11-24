@@ -9,7 +9,11 @@ if (!isset($_SESSION['user_id'])) {
 
 require("../controllers/services_controller.php");
 
-$provider_id = $_SESSION['user_id'];
+if (isset($_REQUEST['provider_id'])) {
+    $provider_id = $_REQUEST['provider_id'];
+} else {
+    $provider_id = $_SESSION['user_id'];
+}
 
 $result = get_services_by_provider_id_ctr($provider_id);
 

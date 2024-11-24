@@ -367,7 +367,7 @@ $user_name = $_SESSION['name'];
                             providersList.empty();
                             response.data.forEach(function(provider) {
                                 providersList.append(`
-                                    <tr class="provider-row" data-provider-id="${provider.provider_id}">
+                                    <tr class="provider-row" data-provider-id="${provider.provider_id}" data-services="${provider.services}">
                                         <td>${provider.provider_name}</td>
                                         <td>${provider.provider_address}</td>
                                     </tr>
@@ -405,10 +405,20 @@ $user_name = $_SESSION['name'];
             }
 
             function filterProviders(searchValue, filterValue) {
-                $('#providersList tr').filter(function() {
-                    var providerName = $(this).find('td:nth-child(1)').text().toLowerCase();
+                searchValue = searchValue.toLowerCase().trim();
+                filterValue = filterValue.toLowerCase().trim();
+
+                $('#providersList tr').each(function() {
+                    var providerName = $(this).find('td:nth-child(1)').text().toLowerCase().trim();
+                    var providerServices = $(this).data('services').toLowerCase().trim();
+
+                    var providerServicesArray = providerServices.split(',').map(function(service) {
+                        return service.trim();
+                    });
+
+                    var matchesFilter = filterValue === "" || providerServicesArray.includes(filterValue);
+
                     var matchesSearch = providerName.includes(searchValue);
-                    var matchesFilter = filterValue === "" || $(this).data('provider-id') === filterValue;
                     $(this).toggle(matchesSearch && matchesFilter);
                 });
             }
@@ -425,12 +435,13 @@ $user_name = $_SESSION['name'];
 
             function loadProviderServices(providerId) {
                 $.ajax({
-                    url: '../actions/getServicesWithDetails.php',
+                    url: '../actions/getServiceByProvider.php',
                     type: 'GET',
                     data: {
                         provider_id: providerId
                     },
                     success: function(response) {
+                        console.log(response);
                         if (response.status === 'success') {
                             var servicesList = $('#servicesList');
                             servicesList.empty();
