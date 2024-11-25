@@ -11,6 +11,7 @@ $provider_name = $_SESSION['name'];
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -267,6 +268,7 @@ $provider_name = $_SESSION['name'];
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <aside class="sidebar">
@@ -302,29 +304,25 @@ $provider_name = $_SESSION['name'];
                     <option value="regular">My Regulars</option>
                 </select>
             </div>
-
             <div class="customer-groups">
-                <div class="customer-group">
+                <div class="customer-group" id="ordersReceivedGroup">
                     <h3>Orders Received</h3>
                     <ul class="customer-list" id="receivedCustomers">
-                        <li data-customer-id="1">Customer 1</li>
-                        <li data-customer-id="2">Customer 2</li>
+                        <!-- Dynamically populated customers -->
                     </ul>
                 </div>
 
-                <div class="customer-group">
+                <div class="customer-group" id="ordersFulfilledGroup">
                     <h3>Orders Fulfilled</h3>
                     <ul class="customer-list" id="fulfilledCustomers">
-                        <li data-customer-id="3">Customer 3</li>
-                        <li data-customer-id="4">Customer 4</li>
+                        <!-- Dynamically populated customers -->
                     </ul>
                 </div>
 
-                <div class="customer-group">
+                <div class="customer-group" id="regularCustomersGroup">
                     <h3>My Regulars</h3>
                     <ul class="customer-list" id="regularCustomers">
-                        <li data-customer-id="5">Customer 5</li>
-                        <li data-customer-id="6">Customer 6</li>
+                        <!-- Dynamically populated customers -->
                     </ul>
                 </div>
             </div>
@@ -351,71 +349,222 @@ $provider_name = $_SESSION['name'];
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../fontawesome/js/all.min.js"></script>
+
     <script>
-        // Get the modal
-        var modal = document.getElementById('customerModal');
+        $(document).ready(function() {
+            fetchOrders();
 
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName('close')[0];
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = 'none';
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
+            function fetchOrders() {
+                $.ajax({
+                    url: '../actions/getSellerOrders.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.status === 'success' && data.data.length > 0) {
+                            processOrders(data.data);
+                        } else {
+                            populateEmptyLists();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching orders:', error);
+                        populateErrorLists();
+                    }
+                });
             }
-        }
 
-        // Get customer list items
-        var customerItems = document.querySelectorAll('.customer-list li');
-
-        // Add click event to each customer item
-        customerItems.forEach(function(item) {
-            item.onclick = function() {
-                var customerId = this.getAttribute('data-customer-id');
-                // Fetch customer details using customerId (this is just a placeholder)
-                var customerDetails = {
-                    name: 'Customer ' + customerId,
-                    contact: '+1234567890',
-                    order: 'Order details for customer ' + customerId
-                };
-
-                // Populate modal with customer details
-                document.getElementById('customerName').value = customerDetails.name;
-                document.getElementById('customerContact').value = customerDetails.contact;
-                document.getElementById('customerOrder').value = customerDetails.order;
-
-                // Display the modal
-                modal.style.display = 'block';
+            function populateEmptyLists() {
+                $('#receivedCustomers').html('<li>No Orders Received</li>');
+                $('#fulfilledCustomers').html('<li>No Orders Fulfilled</li>');
+                $('#regularCustomers').html('<li>No Regular Customers</li>');
             }
-        });
 
-        // Filter and search functionality
-        document.getElementById('search').addEventListener('input', function() {
-            var searchValue = this.value.toLowerCase();
-            customerItems.forEach(function(item) {
-                if (item.textContent.toLowerCase().includes(searchValue)) {
-                    item.style.display = '';
+            // Populate lists with error messages
+            function populateErrorLists() {
+                $('#receivedCustomers').html('<li>Error loading Orders Received</li>');
+                $('#fulfilledCustomers').html('<li>Error loading Orders Fulfilled</li>');
+                $('#regularCustomers').html('<li>Error loading Regular Customers</li>');
+            }
+
+            function processOrders(orders) {
+                var receivedCustomersMap = {};
+                var fulfilledCustomersMap = {};
+                var customerOrderCounts = {};
+
+                $.each(orders, function(index, order) {
+                    var userEmail = order.user_email;
+                    var userName = order.user_name;
+                    var userContact = order.user_contact;
+
+                    if (customerOrderCounts[userEmail]) {
+                        customerOrderCounts[userEmail]++;
+                    } else {
+                        customerOrderCounts[userEmail] = 1;
+                    }
+
+                    if (order.status.toLowerCase() === 'fulfilled') {
+                        fulfilledCustomersMap[userEmail] = {
+                            name: userName,
+                            contact: userContact,
+                            order_id: order.order_id
+                        };
+                    } else {
+                        receivedCustomersMap[userEmail] = {
+                            name: userName,
+                            contact: userContact,
+                            order_id: order.order_id,
+                            order_status: order.status
+                        };
+                    }
+                });
+
+                // Populate Orders Received
+                var receivedCustomers = $.map(receivedCustomersMap, function(customer, key) {
+                    return customer;
+                });
+                $('#receivedCustomers').empty();
+                if (receivedCustomers.length > 0) {
+                    $.each(receivedCustomers, function(index, customer) {
+                        var li = $('<li>')
+                            .text(customer.name)
+                            .attr('data-customer-email', customer.email || customer.name)
+                            .css('cursor', 'pointer')
+                            .on('click', function() {
+                                showCustomerModal(customer);
+                            });
+                        $('#receivedCustomers').append(li);
+                    });
                 } else {
-                    item.style.display = 'none';
+                    $('#receivedCustomers').html('<li>No Orders Received</li>');
+                }
+
+                // Populate Orders Fulfilled
+                var fulfilledCustomers = $.map(fulfilledCustomersMap, function(customer, key) {
+                    return customer;
+                });
+                $('#fulfilledCustomers').empty();
+                if (fulfilledCustomers.length > 0) {
+                    $.each(fulfilledCustomers, function(index, customer) {
+                        var li = $('<li>')
+                            .text(customer.name)
+                            .attr('data-customer-email', customer.email || customer.name)
+                            .css('cursor', 'pointer')
+                            .on('click', function() {
+                                showCustomerModal(customer);
+                            });
+                        $('#fulfilledCustomers').append(li);
+                    });
+                } else {
+                    $('#fulfilledCustomers').html('<li>No Orders Fulfilled</li>');
+                }
+
+                var regularCustomers = Object.keys(customerOrderCounts)
+                    .map(function(email) {
+                        return {
+                            email: email,
+                            count: customerOrderCounts[email]
+                        };
+                    })
+                    .sort(function(a, b) {
+                        return b.count - a.count;
+                    })
+                    .slice(0, 5);
+
+                // Populate My Regulars
+                $('#regularCustomers').empty();
+                if (regularCustomers.length > 0) {
+                    $.each(regularCustomers, function(index, customer) {
+                        // Find customer details from orders
+                        var customerData = orders.find(function(order) {
+                            return order.user_email === customer.email;
+                        });
+
+                        if (customerData) {
+                            var li = $('<li>')
+                                .text(customerData.user_name + ' (' + customer.count + ' orders)')
+                                .attr('data-customer-email', customer.email)
+                                .css('cursor', 'pointer')
+                                .on('click', function() {
+                                    showCustomerModal(customerData);
+                                });
+                            $('#regularCustomers').append(li);
+                        }
+                    });
+                } else {
+                    $('#regularCustomers').html('<li>No Regular Customers</li>');
+                }
+            }
+
+            // Function to show customer details in modal
+            function showCustomerModal(customer) {
+                $('#customerName').val(customer.user_name || customer.name);
+                $('#customerContact').val(customer.user_contact || customer.contact);
+
+                $.ajax({
+                    url: '../actions/getOrderDetails.php',
+                    type: 'GET',
+                    data: {
+                        order_id: customer.order_id
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.status === 'success' && data.data.length > 0) {
+                            var latestOrder = data.data[0];
+                            var orderInfo = latestOrder.service_name + ' - ' + latestOrder.price + ' - ' + customer.order_status;
+                            $('#customerOrder').val(orderInfo);
+                        } else {
+                            $('#customerOrder').val('No recent orders');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching customer order details:', error);
+                        $('#customerOrder').val('Error fetching order details');
+                    }
+                });
+
+                $('#customerModal').fadeIn();
+            }
+
+            $('.close').on('click', function() {
+                $('#customerModal').fadeOut();
+            });
+
+            $(window).on('click', function(event) {
+                if ($(event.target).is('#customerModal')) {
+                    $('#customerModal').fadeOut();
                 }
             });
-        });
 
-        document.getElementById('filter').addEventListener('change', function() {
-            var filterValue = this.value;
-            document.querySelectorAll('.customer-group').forEach(function(group) {
-                if (filterValue === 'all' || group.querySelector('h3').textContent.toLowerCase().includes(filterValue)) {
-                    group.style.display = '';
-                } else {
-                    group.style.display = 'none';
+            $('#search').on('input', function() {
+                var searchValue = $(this).val().toLowerCase();
+                $('.customer-list li').each(function() {
+                    if ($(this).text().toLowerCase().includes(searchValue)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            $('#filter').on('change', function() {
+                var filterValue = $(this).val();
+                if (filterValue === 'all') {
+                    $('.customer-group').show();
+                } else if (filterValue === 'received') {
+                    $('#ordersReceivedGroup').show();
+                    $('#ordersFulfilledGroup, #regularCustomersGroup').hide();
+                } else if (filterValue === 'fulfilled') {
+                    $('#ordersFulfilledGroup').show();
+                    $('#ordersReceivedGroup, #regularCustomersGroup').hide();
+                } else if (filterValue === 'regular') {
+                    $('#regularCustomersGroup').show();
+                    $('#ordersReceivedGroup, #ordersFulfilledGroup').hide();
                 }
             });
         });
     </script>
 </body>
+
 </html>

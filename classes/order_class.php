@@ -175,4 +175,57 @@ class order_class extends db_connection
                 WHERE od.order_id = '$order_id'";
         return $this->db_fetch_all($sql);
     }
+
+    public function create_order_from_delivery($delivery_id)
+    {
+        $ndb = new db_connection();
+        $delivery_id = mysqli_real_escape_string($ndb->db_conn(), $delivery_id);
+
+        $sql = "SELECT d.customer_id, d.driver_id, d.cost
+                FROM `deliveries` d
+                WHERE d.delivery_id = '$delivery_id'";
+
+        $delivery = $this->db_fetch_one($sql);
+
+        if (!$delivery) {
+            return false;
+        }
+
+        $customer_id = $delivery['customer_id'];
+        $driver_id = $delivery['driver_id'];
+
+        $order = "INSERT INTO `orders` (`customer_id`, `service_provider_id`, `order_date`, `status`) 
+                  VALUES ('$customer_id', '$driver_id', NOW(), 'Fulfilled')";
+
+        $insert_order = $this->db_query($order);
+
+        if (!$insert_order) {
+            return false;
+        }
+
+        $order_id = "SELECT `order_id` FROM `orders` 
+                     WHERE `customer_id` = '$customer_id' 
+                     AND `service_provider_id` = '$driver_id'
+                     ORDER BY `order_date` DESC 
+                     LIMIT 1";
+
+        $order = $this->db_fetch_one($order_id);
+
+        if (!$order) {
+            return false;
+        }
+
+        $order_id = $order['order_id'];
+
+        $create_details = "INSERT INTO `order_details` (`order_id`, `quantity`, `price`)
+                            VALUES ('$order_id', '1', '{$delivery['cost']}')";
+
+        $insert_details = $this->db_query($create_details);
+
+        if (!$insert_details) {
+            return false;
+        }
+
+        return $order_id;
+    }
 }

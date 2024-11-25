@@ -16,6 +16,7 @@ $provider = new driver_controller();
 $result = $provider->get_profile_by_id($provider_id);
 
 if ($result) {
+    $_SESSION['vehicle_class'] = $result['option_id'];
     echo json_encode(['status' => 'success', 'data' => $result]);
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Failed to get driver profile info']);

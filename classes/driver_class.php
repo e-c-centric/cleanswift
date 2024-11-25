@@ -113,7 +113,7 @@ class driver_class extends db_connection
     {
         $user_id = mysqli_real_escape_string($this->db_conn(), $user_id);
 
-        $sql = "SELECT u.user_id, u.user_name, u.user_email, u.user_contact, d.license_number, v.vehicle_number, v.vehicle_type, vo.option_description 
+        $sql = "SELECT u.user_id, u.user_name, u.user_email, u.user_contact, d.license_number, v.vehicle_number, v.vehicle_type, vo.option_id, vo.option_description 
                 FROM users u 
                 JOIN drivers d ON u.user_id = d.driver_id 
                 JOIN vehicles v ON d.vehicle_id = v.vehicle_id 

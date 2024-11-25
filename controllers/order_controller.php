@@ -1,5 +1,4 @@
 <?php
-// filepath: /c:/xampp/htdocs/cleanswift/controllers/order_controller.php
 include("../classes/order_class.php");
 
 //--INSERT--//
@@ -39,4 +38,10 @@ function get_order_details_ctr($order_id)
 {
     $order = new order_class();
     return $order->get_order_details($order_id);
+}
+
+function create_order_from_delivery_ctr($delivery_id)
+{
+    $order = new order_class();
+    return $order->create_order_from_delivery($delivery_id);
 }

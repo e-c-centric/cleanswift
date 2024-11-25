@@ -18,6 +18,8 @@ $user_name = $_SESSION['name'];
     <title>My Orders</title>
     <link rel="stylesheet" href="../css/dashboard.css">
     <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- FontAwesome CSS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,6 +30,95 @@ $user_name = $_SESSION['name'];
         .container {
             display: flex;
             height: 100vh;
+        }
+
+        /* Action Buttons Styles */
+        .action-button {
+            border: none;
+            padding: 8px 12px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .fulfill-button {
+            background-color: #28a745;
+            /* Green */
+        }
+
+        .fulfill-button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        .cancel-button {
+            background-color: #dc3545;
+            /* Red */
+        }
+
+        .cancel-button:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
+
+        /* Optional: Adjust icon size if necessary */
+        .action-button i {
+            margin-right: 0;
+            /* Remove right margin since there's no text */
+        }
+
+        /* Tooltip Styles (Optional) */
+        .action-button[title] {
+            position: relative;
+        }
+
+        .action-button[title]::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 125%;
+            /* Position above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            font-size: 14px;
+        }
+
+        .action-button[title]:hover::after {
+            opacity: 1;
+        }
+
+        .status-pending {
+            color: #ffc107;
+            /* Amber */
+            font-weight: bold;
+        }
+
+        .status-in-progress {
+            color: #17a2b8;
+            /* Teal */
+            font-weight: bold;
+        }
+
+        .status-completed {
+            color: #28a745;
+            /* Green */
+            font-weight: bold;
+        }
+
+        .status-cancelled {
+            color: #dc3545;
+            /* Red */
+            font-weight: bold;
         }
 
         .sidebar {
@@ -249,6 +340,141 @@ $user_name = $_SESSION['name'];
         .save-button:hover {
             background-color: #218838;
         }
+
+        /* Enhanced Order Items Table Styles */
+        .order-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-details th,
+        .order-details td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .order-details th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .order-details tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .order-details tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .order-details th:first-child,
+        .order-details td:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        .order-details th:last-child,
+        .order-details td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .order-details th,
+        .order-details td {
+            vertical-align: middle;
+        }
+
+        /* Responsive Styling */
+        @media screen and (max-width: 768px) {
+            .order-details table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .order-details th,
+            .order-details td {
+                padding: 10px;
+            }
+        }
+
+        /* Modal Enhancements */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px 40px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 10px;
+            position: relative;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            color: #aaa;
+            position: absolute;
+            right: 25px;
+            top: 20px;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #000;
+        }
+
+        /* Order Details Header */
+        .order-details h3 {
+            margin-bottom: 15px;
+            color: #17a2b8;
+            font-size: 20px;
+            border-bottom: 2px solid #17a2b8;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
     </style>
 </head>
 
@@ -282,107 +508,235 @@ $user_name = $_SESSION['name'];
                 <table class="orders-table">
                     <thead>
                         <tr>
-                            <th>Order ID</th>
                             <th>Customer Name</th>
-                            <th>Service</th>
+                            <th>Order Date</th>
                             <th>Status</th>
-                            <th>Payment Received</th>
+                            <th>Customer Email</th>
+                            <th>Customer Contact</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Customer 1</td>
-                            <td>Service 1</td>
-                            <td>Pending</td>
-                            <td>No</td>
-                            <td>
-                                <button class="edit-button" data-order-id="1">Edit</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Customer 2</td>
-                            <td>Service 2</td>
-                            <td>In Progress</td>
-                            <td>Yes</td>
-                            <td>
-                                <button class="edit-button" data-order-id="2">Edit</button>
-                            </td>
-                        </tr>
+                    <tbody id="ordersTableBody">
+                        <!-- Orders will be populated here dynamically -->
                     </tbody>
                 </table>
+                <p id="noOrdersMessage" style="display: none;">No orders found.</p>
             </section>
         </main>
     </div>
 
-    <!-- Edit Order Modal -->
-    <div id="orderModal" class="modal">
+    <!-- Order Details Modal -->
+    <div id="orderDetailsModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Edit Order</h2>
-            <form id="orderForm">
-                <div class="form-group">
-                    <label for="orderStatus">Status</label>
-                    <select id="orderStatus" name="orderStatus" required>
-                        <option value="Pending">Pending</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="paymentReceived">Payment Received</label>
-                    <select id="paymentReceived" name="paymentReceived" required>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select>
-                </div>
-                <button type="submit" class="save-button">Save</button>
-            </form>
+            <span class="close-modal">&times;</span>
+            <div class="order-details">
+                <h3>Order Items</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Service Name</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderItemsBody">
+                        <!-- Order items will be populated here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Get the modal
-        var modal = document.getElementById('orderModal');
+        $(document).ready(function() {
+            fetchOrders();
 
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName('close')[0];
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = 'none';
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
+            // Fetch Orders from getSellerOrders.php
+            function fetchOrders() {
+                $.ajax({
+                    url: '../actions/getSellerOrders.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.status === 'success' && data.data.length > 0) {
+                            populateOrdersTable(data.data);
+                            $('#noOrdersMessage').hide();
+                        } else {
+                            $('#ordersTableBody').empty();
+                            $('#noOrdersMessage').show();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching orders:', error);
+                        $('#noOrdersMessage').text('Error loading orders.').show();
+                    }
+                });
             }
-        }
 
-        // Get all edit buttons
-        var editButtons = document.querySelectorAll('.edit-button');
+            // Populate Orders Table
+            function populateOrdersTable(orders) {
+                var $tbody = $('#ordersTableBody');
+                $tbody.empty();
 
-        // Add click event to each edit button
-        editButtons.forEach(function(button) {
-            button.onclick = function() {
-                var orderId = this.getAttribute('data-order-id');
-                // Fetch order details using orderId (this is just a placeholder)
-                var orderDetails = {
-                    status: 'Pending',
-                    paymentReceived: 'No'
-                };
+                $.each(orders, function(index, order) {
+                    var statusClass = getStatusClass(order.status);
 
-                // Populate modal with order details
-                document.getElementById('orderStatus').value = orderDetails.status;
-                document.getElementById('paymentReceived').value = orderDetails.paymentReceived;
+                    var $tr = $('<tr>').attr('data-order-id', order.order_id);
 
-                // Display the modal
-                modal.style.display = 'block';
+                    // Customer Name
+                    $('<td>').text(order.user_name).appendTo($tr);
+
+                    // Order Date
+                    $('<td>').text(order.order_date).appendTo($tr);
+
+                    // Status with Colored Class
+                    $('<td>').text(order.status).addClass(statusClass).appendTo($tr);
+
+                    // Customer Email
+                    $('<td>').text(order.user_email).appendTo($tr);
+
+                    // Customer Contact
+                    $('<td>').text(order.user_contact).appendTo($tr);
+
+                    // Add Click Event to Row
+                    $tr.on('click', function() {
+                        var orderId = $(this).data('order-id');
+                        showModal(orderId);
+                    });
+
+                    // Actions
+                    var $actions = $('<td>');
+
+                    // Fulfill Button
+                    $('<button>')
+                        .html('<i class="fas fa-check-circle"></i>') // FontAwesome Check Icon
+                        .addClass('action-button fulfill-button') // Add classes for styling
+                        .attr('title', 'Fulfill Order') // Tooltip for accessibility
+                        .on('click', function(event) {
+                            event.stopPropagation(); // Prevent triggering row click
+                            var orderId = $(this).closest('tr').data('order-id');
+                            fulfillOrder(orderId);
+                        })
+                        .appendTo($actions);
+
+                    // Cancel Button
+                    $('<button>')
+                        .html('<i class="fas fa-times-circle"></i>') // FontAwesome Times Icon
+                        .addClass('action-button cancel-button') // Add classes for styling
+                        .attr('title', 'Cancel Order') // Tooltip for accessibility
+                        .on('click', function(event) {
+                            event.stopPropagation(); // Prevent triggering row click
+                            var orderId = $(this).closest('tr').data('order-id');
+                            cancelOrder(orderId);
+                        })
+                        .appendTo($actions);
+
+                    $tr.append($actions);
+                    $tbody.append($tr);
+                });
             }
+
+            // Determine Status Class based on Status Text
+            function getStatusClass(status) {
+                switch (status.toLowerCase()) {
+                    case 'pending':
+                        return 'status-pending';
+                    case 'in progress':
+                        return 'status-in-progress';
+                    case 'completed':
+                        return 'status-completed';
+                    case 'cancelled':
+                        return 'status-cancelled';
+                    default:
+                        return '';
+                }
+            }
+
+            // Populate Order Details in Modal
+            function populateOrderDetails(orderId, items) {
+                $('#detailOrderId').text(orderId);
+                // Set Order Date and Status if available
+                // Example:
+                // $('#detailOrderDate').text(orderDate);
+                // $('#detailStatus').text(status).removeClass().addClass(getStatusClass(status));
+
+                var $tbody = $('#orderItemsBody');
+                $tbody.empty(); // Clear previous items
+
+                $.each(items, function(index, item) {
+                    var $tr = $('<tr>');
+
+                    // Service Name
+                    $('<td>')
+                        .text(item.service_name)
+                        .attr('data-label', 'Service Name')
+                        .appendTo($tr);
+
+                    // Quantity
+                    $('<td>')
+                        .text(item.quantity)
+                        .attr('data-label', 'Quantity')
+                        .appendTo($tr);
+
+                    // Unit Price
+                    $('<td>')
+                        .text(`$${parseFloat(item.unit_price).toFixed(2)}`)
+                        .attr('data-label', 'Unit Price')
+                        .appendTo($tr);
+
+                    // Total Price
+                    var totalPrice = parseFloat(item.unit_price) * parseInt(item.quantity);
+                    $('<td>')
+                        .text(`$${totalPrice.toFixed(2)}`)
+                        .attr('data-label', 'Total Price')
+                        .appendTo($tr);
+
+                    $tbody.append($tr);
+                });
+            }
+
+            // Show Modal
+            function showModal(orderId) {
+                $('#orderDetailsModal').fadeIn();
+
+                // Fetch Order Details
+                $.ajax({
+                    url: '../actions/getOrderDetails.php',
+                    type: 'GET',
+                    data: {
+                        order_id: orderId
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.status === 'success') {
+                            populateOrderDetails(orderId, data.data);
+                        } else {
+                            console.error('Error fetching order details:', data.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching order details:', error);
+                    }
+                });
+            }
+
+            // Hide Modal
+            function hideModal() {
+                $('#orderDetailsModal').fadeOut();
+            }
+
+            // Close Modal When Clicking on <span> (x)
+            $('.close-modal').on('click', function() {
+                hideModal();
+            });
+
+            // Close Modal When Clicking Outside of Modal Content
+            $(window).on('click', function(event) {
+                if ($(event.target).is('#orderDetailsModal')) {
+                    hideModal();
+                }
+            });
         });
     </script>
 </body>

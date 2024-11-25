@@ -188,7 +188,7 @@ $user_name = $_SESSION['name'];
             <nav class="nav">
                 <ul>
                     <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
-                    <li><a href="pickup.php"><i class="fas fa-truck"></i>Pickups</a></li>
+                    <li><a href="pickup.php"><i class="fas fa-truck"></i>Deliveries</a></li>
                     <li><a href="earnings.php" class="active"><i class="fas fa-dollar-sign"></i>Earning Breakdown</a></li>
                     <li><a href="vehicle.php"><i class="fas fa-car"></i>My Vehicle</a></li>
                     <li><a href="profile.php"><i class="fas fa-user"></i>Profile</a></li>

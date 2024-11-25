@@ -282,7 +282,7 @@ $user_name = $_SESSION['name'];
             <nav class="nav">
                 <ul>
                     <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
-                    <li><a href="pickup.php"><i class="fas fa-truck"></i>Pickups</a></li>
+                    <li><a href="pickup.php"><i class="fas fa-truck"></i>Deliveries</a></li>
                     <li><a href="earnings.php"><i class="fas fa-dollar-sign"></i>Earning Breakdown</a></li>
                     <li><a href="vehicle.php" class="active"><i class="fas fa-car"></i>My Vehicle</a></li>
                     <li><a href="profile.php"><i class="fas fa-user"></i>Profile</a></li>
@@ -411,7 +411,7 @@ $user_name = $_SESSION['name'];
                             select.empty(); // Clear existing options
                             select.append('<option value="">Select an option</option>');
                             $.each(options, function(index, option) {
-                                select.append('<option value="' + option.option_description + '">' + option.option_description + '</option>');
+                                select.append('<option value="' + option.option_id + '">' + option.option_description + '</option>');
                             });
 
                             // Set the current option
@@ -441,7 +441,7 @@ $user_name = $_SESSION['name'];
 
                 var vehicleNumber = $('#vehicleNumberEdit').val().trim();
                 var vehicleType = $('#vehicleTypeEdit').val().trim();
-                var optionDescription = $('#optionDescriptionEdit').val();
+                var optionId = $('#optionDescriptionEdit').val().trim();
 
                 // Basic validation
                 if (!vehicleNumber || !vehicleType || !optionDescription) {
@@ -460,7 +460,7 @@ $user_name = $_SESSION['name'];
                     data: {
                         vehicle_number: vehicleNumber,
                         vehicle_type: vehicleType,
-                        option_description: optionDescription
+                        option_id: optionId
                     },
                     success: function(response) {
                         Swal.fire({

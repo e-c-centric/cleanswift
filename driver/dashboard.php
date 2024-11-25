@@ -17,7 +17,9 @@ $user_name = $_SESSION['name'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Dashboard</title>
     <link rel="stylesheet" href="../css/dashboard.css">
-    <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="../fontawesome/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,7 +34,7 @@ $user_name = $_SESSION['name'];
 
         .sidebar {
             width: 250px;
-            background-color:rgb(51, 7, 100);
+            background-color: rgb(51, 7, 100);
             color: #fff;
             display: flex;
             flex-direction: column;
@@ -188,7 +190,7 @@ $user_name = $_SESSION['name'];
             <nav class="nav">
                 <ul>
                     <li><a href="dashboard.php" class="active"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
-                    <li><a href="pickup.php"><i class="fas fa-truck"></i>Pickups</a></li>
+                    <li><a href="pickup.php"><i class="fas fa-truck"></i>Deliveries</a></li>
                     <li><a href="earnings.php"><i class="fas fa-dollar-sign"></i>Earning Breakdown</a></li>
                     <li><a href="vehicle.php"><i class="fas fa-car"></i>My Vehicle</a></li>
                     <li><a href="profile.php"><i class="fas fa-user"></i>Profile</a></li>
@@ -229,6 +231,17 @@ $user_name = $_SESSION['name'];
 
         </main>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: '../actions/getDriverProfileInfo.php',
+                type: 'GET',
+                success: function(response) {
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -11,9 +11,9 @@ class delivery_controller
     }
 
     // Customer requests a delivery
-    public function request_delivery($customer_id, $provider_id, $dropoff_time, $pickup_time = null)
+    public function request_delivery($customer_id, $provider_id, $dropoff_time, $vehicle_type, $pickup_time = null)
     {
-        return $this->delivery->add_delivery($customer_id, $provider_id, $dropoff_time, $pickup_time);
+        return $this->delivery->add_delivery($customer_id, $provider_id, $dropoff_time, $vehicle_type, $pickup_time);
     }
 
     // Driver accepts the delivery
@@ -22,21 +22,18 @@ class delivery_controller
         return $this->delivery->accept_delivery($delivery_id, $driver_id, $cost);
     }
 
-    // Driver picks up laundry from customer
     public function pick_up_laundry($delivery_id)
     {
         $delivery_status = 'Transit to laundry';
         return $this->delivery->update_delivery_status($delivery_id, $delivery_status);
     }
 
-    // Provider indicates laundry is done, driver returns for it
     public function laundry_ready($delivery_id)
     {
         $delivery_status = 'Transit from laundry';
         return $this->delivery->update_delivery_status($delivery_id, $delivery_status);
     }
 
-    // Customer receives their laundry back
     public function complete_delivery($delivery_id)
     {
         $delivery_status = 'Returned to customer';
@@ -78,5 +75,15 @@ class delivery_controller
     {
         return $this->delivery->get_deliveries_by_customer_id($customer_id);
     }
+
+    // Get available deliveries for driver
+    public function get_deliveries($vehicle_type)
+    {
+        return $this->delivery->get_available_deliveries($vehicle_type);
+    }
+
+    public function get_delivery_details($delivery_id)
+    {
+        return $this->delivery->get_delivery_details($delivery_id);
+    }
 }
-?>
