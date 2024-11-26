@@ -38,7 +38,16 @@ $user_name = $_SESSION['name'];
             flex-direction: column;
             justify-content: space-between;
             padding: 20px;
-            height: fit-content;
+            height: 100vh;
+            /* Ensures full viewport height */
+            position: fixed;
+            /* Fixes sidebar in place */
+            top: 0;
+            /* Aligns to the top of the viewport */
+            left: 0;
+            /* Aligns to the left of the viewport */
+            overflow-y: auto;
+            /* Adds scroll if content overflows */
         }
 
         .logo {
