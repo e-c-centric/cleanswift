@@ -12,53 +12,94 @@ class delivery_class extends db_connection
         $ndb = new db_connection();
         $conn = $ndb->db_conn();
 
+        // Sanitize input parameters
         $customer_id = mysqli_real_escape_string($conn, $customer_id);
         $dropoff_time = mysqli_real_escape_string($conn, $dropoff_time);
         $pickup_time = $pickup_time ? "'" . mysqli_real_escape_string($conn, $pickup_time) . "'" : "NULL";
         $delivery_status = 'With Customer';
+        $vehicle_type = mysqli_real_escape_string($conn, $vehicle_type);
+
+        // Log sanitized and prepared values
+        error_log("Sanitized Values - Customer ID: $customer_id, Delivery Status: $delivery_status, Pickup Time: $pickup_time, Dropoff Time: $dropoff_time, Vehicle Type: $vehicle_type");
 
         // Begin transaction
         $conn->begin_transaction();
         try {
+            // Validate vehicle_type exists in vehicle_options
+            $sqlValidateVehicle = "SELECT COUNT(*) as count FROM `vehicle_options` WHERE `option_id` = '$vehicle_type'";
+            error_log("Executing SQL: $sqlValidateVehicle");
+
+            $validateResult = $this->db_fetch_one($sqlValidateVehicle);
+            if ($validateResult['count'] == 0) {
+                error_log("Invalid vehicle_type: $vehicle_type does not exist in vehicle_options.");
+                throw new Exception("Invalid vehicle type selected.");
+            }
+
+            // Insert into deliveries table
             $sqlDeliveries = "INSERT INTO `deliveries` (`customer_id`, `delivery_status`, `pickup_time`, `dropoff_time`, `vehicle_class`)
-                             VALUES ('$customer_id', '$delivery_status', $pickup_time, '$dropoff_time', '$vehicle_type')";
+                         VALUES ('$customer_id', '$delivery_status', $pickup_time, '$dropoff_time', '$vehicle_type')";
+
+            // Log the SQL query
+            error_log("Executing SQL: $sqlDeliveries");
 
             if (!$this->db_query($sqlDeliveries)) {
+                $error = mysqli_error($conn);
+                error_log("Failed to execute query: $sqlDeliveries. Error: $error");
                 throw new Exception("Failed to insert into deliveries table.");
             }
 
+            // Fetch the latest delivery_id
             $sqlFetchDeliveryId = "SELECT delivery_id FROM `deliveries` 
-                                   WHERE `customer_id` = '$customer_id' 
-                                   AND `delivery_status` = '$delivery_status' 
-                                   AND `dropoff_time` = '$dropoff_time' 
-                                   ORDER BY `delivery_id` DESC 
-                                   LIMIT 1";
+                               WHERE `customer_id` = '$customer_id' 
+                               AND `delivery_status` = '$delivery_status' 
+                               AND `dropoff_time` = '$dropoff_time' 
+                               ORDER BY `delivery_id` DESC 
+                               LIMIT 1";
+
+            // Log the SQL query
+            error_log("Executing SQL: $sqlFetchDeliveryId");
 
             $result = $this->db_fetch_one($sqlFetchDeliveryId);
             if (!$result || !isset($result['delivery_id'])) {
+                error_log("Failed to retrieve delivery ID for customer ID: $customer_id.");
                 throw new Exception("Failed to retrieve delivery ID.");
             }
 
             $delivery_id = $result['delivery_id'];
+            error_log("Retrieved delivery_id: $delivery_id");
 
+            // Validate that provider_ids is an array
             if (!is_array($provider_ids)) {
+                error_log("Provider IDs are not in an array format.");
                 throw new Exception("Provider IDs must be an array.");
             }
 
+            // Insert into delivery_provider table for each provider_id
             foreach ($provider_ids as $provider_id) {
                 $provider_id = mysqli_real_escape_string($conn, $provider_id);
                 $sqlDeliveryProviders = "INSERT INTO `delivery_provider` (`delivery_id`, `provider_id`) 
-                                         VALUES ('$delivery_id', '$provider_id')";
+                                     VALUES ('$delivery_id', '$provider_id')";
+
+                // Log the SQL query
+                error_log("Executing SQL: $sqlDeliveryProviders");
 
                 if (!$this->db_query($sqlDeliveryProviders)) {
-                    throw new Exception("Failed to insert into delivery_providers table for provider ID: $provider_id.");
+                    $error = mysqli_error($conn);
+                    error_log("Failed to execute query: $sqlDeliveryProviders. Error: $error");
+                    throw new Exception("Failed to insert into delivery_provider table for provider ID: $provider_id.");
                 }
+
+                error_log("Successfully inserted provider ID: $provider_id for delivery ID: $delivery_id.");
             }
 
+            // Commit the transaction
             $conn->commit();
+            error_log("Transaction committed successfully for delivery ID: $delivery_id.");
             return true;
         } catch (Exception $e) {
+            // Rollback the transaction on error
             $conn->rollback();
+            error_log("Transaction rolled back due to error: " . $e->getMessage());
             return false;
         }
     }
