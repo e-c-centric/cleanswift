@@ -72,33 +72,68 @@ $user_name = $_SESSION['name'];
             background-color: #28a745;
             color: #fff;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            font-weight: bold;
         }
 
         .make-payment-btn:hover {
             background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         }
 
-        /* Pulsing Row Animation */
-        @keyframes pulse {
+        .make-payment-btn:active {
+            background-color: #1e7e34;
+            transform: translateY(0);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Enhanced Pulsing and Glowing Row Animation */
+        @keyframes pulse-glow {
             0% {
-                background-color: rgba(0, 123, 255, 0.1);
+                box-shadow: 0 0 15px rgba(40, 167, 69, 0.8), 0 0 30px rgba(40, 167, 69, 0.6);
+                border-left: 4px solid #28a745;
             }
 
             50% {
-                background-color: rgba(0, 123, 255, 0.3);
+                box-shadow: 0 0 30px rgba(40, 167, 69, 1), 0 0 60px rgba(40, 167, 69, 0.8);
+                border-left: 4px solid #28a745;
             }
 
             100% {
-                background-color: rgba(0, 123, 255, 0.1);
+                box-shadow: 0 0 15px rgba(40, 167, 69, 0.8), 0 0 30px rgba(40, 167, 69, 0.6);
+                border-left: 4px solid #28a745;
             }
         }
 
         .pulse {
-            animation: pulse 2s infinite;
+            animation: pulse-glow 2s infinite;
+            position: relative;
+            background-color: rgba(40, 167, 69, 0.05);
+            transition: background-color 0.3s ease;
+        }
+
+        .pulse::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #28a745;
+            border-radius: 4px;
+            pointer-events: none;
+            box-sizing: border-box;
+            animation: pulse-glow 2s infinite;
+        }
+
+        .pulse:hover {
+            background-color: rgba(40, 167, 69, 0.1);
         }
 
         /* Status Classes Styling */
@@ -115,6 +150,12 @@ $user_name = $_SESSION['name'];
         .status-cancelled {
             color: #dc3545;
             font-weight: bold;
+        }
+
+        /* Optional: Enhance Table Styling for Better Visibility */
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
         .nav ul li a {
@@ -547,12 +588,14 @@ $user_name = $_SESSION['name'];
 
                                 // Determine if the status is 'Fulfilled' to show the payment button
                                 var paymentButton = '';
+                                var rowClass = '';
                                 if (order.status === 'Fulfilled') {
                                     paymentButton = `<button class="make-payment-btn" data-order-id="${order.order_id}">Make Payment</button>`;
+                                    rowClass = 'pulse'; // Add pulse class only to fulfilled orders
                                 }
 
                                 ordersTableBody.append(`
-                        <tr data-order-id="${order.order_id}" class="pulse">
+                        <tr data-order-id="${order.order_id}" class="${rowClass}">
                             <td>${order.order_date}</td>
                             <td class="${statusClass}">${order.status}</td>
                             <td>${serviceProviderName}</td>
@@ -630,7 +673,6 @@ $user_name = $_SESSION['name'];
                     });
                 });
             }
-
             // Function to Fetch and Populate Order Items
             function fetchOrderItems(orderId) {
                 $.ajax({
