@@ -147,14 +147,12 @@ class order_class extends db_connection
         p.provider_name, 
         p.provider_address, 
         u.user_name AS driver_name, 
-        u.user_contact AS driver_contact,
-        pmt.status AS payment_status
+        u.user_contact AS driver_contact
     FROM `orders` o
     LEFT JOIN `providers` p ON o.service_provider_id = p.provider_id
     LEFT JOIN `drivers` d ON o.service_provider_id = d.driver_id
     LEFT JOIN `users` u ON d.driver_id = u.user_id
     JOIN `order_details` od ON o.order_id = od.order_id
-    JOIN `payments` pmt ON o.order_id = pmt.order_id
     WHERE o.customer_id = '$customer_id'
     ORDER BY 
         CASE 

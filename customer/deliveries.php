@@ -751,7 +751,7 @@ $user_name = $_SESSION['name'];
             </div>
             <div class="detail">
                 <label for="deliveryCost">Cost</label>
-                <span id="deliveryCost">$0.00</span>
+                <span id="deliveryCost">GHC0.00</span>
             </div>
         </div>
     </div>
@@ -957,7 +957,7 @@ $user_name = $_SESSION['name'];
                                 costs.forEach(cost => {
                                     totalCost += cost;
                                 });
-                                $('#deliveryCost').text('$' + totalCost.toFixed(2));
+                                $('#deliveryCost').text('GHC' + totalCost.toFixed(2));
 
                                 // Remove existing Accept Trip button if any to prevent duplicates
                                 $('#accept-trip-btn').remove();

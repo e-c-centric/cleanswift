@@ -624,13 +624,13 @@ $user_name = $_SESSION['name'];
                                            ${item.provider_name}
                                         </a>
                                     </td>
-                                    <td>$${parseFloat(item.price).toFixed(2)}</td>
+                                    <td>GHC${parseFloat(item.price).toFixed(2)}</td>
                                     <td>
                                         <input type="number" class="quantity-input" value="${item.quantity}" 
                                                data-service-id="${item.service_id}" 
                                                data-provider-id="${item.provider_id}" min="1">
                                     </td>
-                                    <td>$${itemTotal.toFixed(2)}</td>
+                                    <td>GHC${itemTotal.toFixed(2)}</td>
                                     <td>${item.added_at}</td>
                                     <td class="action-buttons">
                                         <button class="update-button btn-primary" data-service-id="${item.service_id}">
@@ -644,7 +644,7 @@ $user_name = $_SESSION['name'];
                             `);
                                 totalCost += itemTotal;
                             });
-                            $('#totalCost').text('Total Cost: $' + totalCost.toFixed(2));
+                            $('#totalCost').text('Total Cost: GHC' + totalCost.toFixed(2));
                             attachEventHandlers();
                             $('#checkoutButton').show();
                             $('#emptyCartMessage').hide();

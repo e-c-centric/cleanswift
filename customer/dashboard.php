@@ -219,7 +219,7 @@ $user_name = $_SESSION['name'];
                 </div>
                 <div class="card">
                     <h3>Total Spending</h3>
-                    <p id="totalSpending">$500.00</p>
+                    <p id="totalSpending">GHC500.00</p>
                 </div>
             </section>
 

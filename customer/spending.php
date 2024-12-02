@@ -590,7 +590,7 @@ $user_name = $_SESSION['name'];
             <table>
                 <thead>
                     <tr>
-                        <th>Amount ($)</th>
+                        <th>Amount (GHC)</th>
                         <th>Paid To</th>
                         <th>Date</th>
                         <th>Status</th>
@@ -613,7 +613,7 @@ $user_name = $_SESSION['name'];
                         <input type="email" id="email-address" required />
                     </div>
                     <div class="form-group">
-                        <label for="amount">Amount ($)</label>
+                        <label for="amount">Amount (GHC)</label>
                         <input type="tel" id="amount" required disabled />
                     </div>
                     <div class="form-group">
@@ -678,7 +678,7 @@ $user_name = $_SESSION['name'];
 
                                 const row = `
                                 <tr>
-                                    <td>$${amount.toFixed(2)}</td>
+                                    <td>GHC${amount.toFixed(2)}</td>
                                     <td>${payment.service_provider_name}</td>
                                     <td>${date}</td>
                                     <td class="${statusClass}">${payment.payment_status}</td>
@@ -688,9 +688,9 @@ $user_name = $_SESSION['name'];
                                 tableBody.append(row);
                             });
 
-                            $('#total-spent').text(`$${totalSpent.toFixed(2)}`);
-                            $('#total-paid').text(`$${totalPaid.toFixed(2)}`);
-                            $('#total-outstanding').text(`$${totalOutstanding.toFixed(2)}`);
+                            $('#total-spent').text(`GHC${totalSpent.toFixed(2)}`);
+                            $('#total-paid').text(`GHC${totalPaid.toFixed(2)}`);
+                            $('#total-outstanding').text(`GHC${totalOutstanding.toFixed(2)}`);
                         } else {
                             alert(response.message || 'Failed to fetch payments.');
                         }

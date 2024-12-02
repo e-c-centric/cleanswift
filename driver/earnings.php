@@ -285,7 +285,7 @@ $user_name = $_SESSION['name'];
                     <tr>
                         <th>Customer Name</th>
                         <th>Customer Contact</th>
-                        <th>Amount ($)</th>
+                        <th>Amount (GHC)</th>
                         <th>Status</th>
                     </tr>
                 </thead>

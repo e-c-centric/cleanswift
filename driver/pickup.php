@@ -428,7 +428,7 @@ $user_name = $_SESSION['name'];
             </div>
             <div class="detail">
                 <label for="deliveryCost">Cost</label>
-                <span id="deliveryCost">$0.00</span>
+                <span id="deliveryCost">GHC 0.00</span>
             </div>
         </div>
     </div>
