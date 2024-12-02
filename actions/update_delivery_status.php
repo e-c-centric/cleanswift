@@ -29,6 +29,10 @@ $delivery = new delivery_controller();
 
 switch ($new_status) {
     case 'Transit to laundry':
+        if ($_SESSION['role_id'] != 2) {
+            echo json_encode(['status' => 'error', 'message' => 'Unauthorized access.']);
+            exit();
+        }
         $result = $delivery->pick_up_laundry($delivery_id);
         if ($result) {
             $result = ['status' => 'success', 'message' => 'Delivery status updated successfully.'];
@@ -51,6 +55,10 @@ switch ($new_status) {
         break;
 
     case 'Returned to customer':
+        if ($_SESSION['role_id'] != 2) {
+            echo json_encode(['status' => 'error', 'message' => 'Unauthorized access.']);
+            exit();
+        }
         $result = $delivery->complete_delivery($delivery_id);
         if ($result) {
             $part2 = create_order_from_delivery_ctr($delivery_id);

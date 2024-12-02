@@ -57,7 +57,6 @@ if ($err) {
     $updateStatus = $paymentController->update_payment_ctr($payment_id, $amount, "Paid");
 
     if ($updateStatus) {
-      $order = delete_order_ctr($payment_id);
       echo json_encode(["success" => true, "message" => "Payment successful"]);
       exit();
     } else {

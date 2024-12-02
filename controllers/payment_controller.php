@@ -34,7 +34,7 @@ class PaymentController
      */
     public function update_payment_ctr($payment_id, $amt = null, $status = null)
     {
-        $this->payment->update_payment($payment_id, $amt, $status);
+        return $this->payment->update_payment($payment_id, $amt, $status);
     }
 
     /**

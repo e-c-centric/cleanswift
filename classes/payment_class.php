@@ -71,6 +71,8 @@ class payment_class extends db_connection
             }
 
             $this->db_conn()->commit();
+
+            return true;
         } catch (Exception $e) {
             $this->db_conn()->rollback();
             throw $e;

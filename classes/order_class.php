@@ -153,7 +153,8 @@ class order_class extends db_connection
     LEFT JOIN `drivers` d ON o.service_provider_id = d.driver_id
     LEFT JOIN `users` u ON d.driver_id = u.user_id
     JOIN `order_details` od ON o.order_id = od.order_id
-    WHERE o.customer_id = '$customer_id'
+    WHERE o.customer_id = '$customer_id' AND
+    o.order_id NOT IN (SELECT order_id FROM payments WHERE status = 'Paid')
     ORDER BY 
         CASE 
             WHEN o.status = 'Fulfilled' THEN 0 
