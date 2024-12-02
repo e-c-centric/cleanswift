@@ -2,6 +2,7 @@
 header('Content-Type: application/json');
 require_once("../controllers/delivery_controller.php");
 require_once("../controllers/order_controller.php");
+require_once("../controllers/payment_controller.php");
 
 session_start();
 
@@ -54,6 +55,8 @@ switch ($new_status) {
         if ($result) {
             $part2 = create_order_from_delivery_ctr($delivery_id);
             if ($part2) {
+                $part3 = new PaymentController();
+                $part3->add_payment_ctr($part2);
                 $result = ['status' => 'success', 'message' => 'Delivery status updated successfully.'];
             } else {
                 $result = ['status' => 'error', 'message' => 'Failed to update delivery status.'];

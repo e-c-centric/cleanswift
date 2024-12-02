@@ -502,6 +502,7 @@ $user_name = $_SESSION['name'];
                     <li><a href="../customer/cart.php"><i class="fas fa-shopping-cart"></i>My Cart</a></li>
                     <li><a href="../customer/orders.php" class="active"><i class="fas fa-box-open"></i>My Orders</a></li>
                     <li><a href="../customer/deliveries.php"><i class="fas fa-user"></i>Deliveries</a></li>
+                    <li><a href="../customer/spending.php"><i class="fas fa-money-check-alt"></i>Payments</a></li>
                     <li><a href="../customer/customer_details.php"><i class="fas fa-user"></i>My Details</a></li>
                 </ul>
             </nav>
@@ -660,7 +661,7 @@ $user_name = $_SESSION['name'];
                     // Implement your payment logic here
                     Swal.fire({
                         title: 'Make Payment',
-                        text: `Proceed to make payment for Order ID: ${orderId}?`,
+                        text: `Proceed to make payment?`,
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: 'Yes, Pay',
@@ -668,7 +669,7 @@ $user_name = $_SESSION['name'];
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Redirect to payment page or initiate payment process
-                            window.location.href = `/payment.php?order_id=${orderId}`;
+                            window.location.href = `spending.php`;
                         }
                     });
                 });

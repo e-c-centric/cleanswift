@@ -38,6 +38,7 @@ $provider_name = $_SESSION['name'];
             flex-direction: column;
             justify-content: space-between;
             padding: 20px;
+            height: max-content;
         }
 
         .logo {
@@ -282,6 +283,7 @@ $provider_name = $_SESSION['name'];
                     <li><a href="manage_services.php"><i class="fas fa-cogs"></i>Manage Services</a></li>
                     <li><a href="orders.php"><i class="fas fa-box"></i>Orders</a></li>
                     <li><a href="pickup.php"><i class="fas fa-chart-line"></i>Incoming Deliveries</a></li>
+                    <li><a href="earnings.php"><i class="fas fa-wallet"></i>Earnings</a></li>
                     <li><a href="profile.php"><i class="fas fa-user"></i>Profile</a></li>
                 </ul>
             </nav>

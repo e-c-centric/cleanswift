@@ -15,9 +15,11 @@ $user_name = $_SESSION['name'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Earnings</title>
+    <title>My Orders</title>
     <link rel="stylesheet" href="../css/dashboard.css">
-    <link rel="stylesheet" href="../fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../fontawesome/css/all.min.css"> <!-- FontAwesome CSS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,19 +32,109 @@ $user_name = $_SESSION['name'];
             height: 100vh;
         }
 
+        /* Action Buttons Styles */
+        .action-button {
+            border: none;
+            padding: 8px 12px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .fulfill-button {
+            background-color: #28a745;
+            /* Green */
+        }
+
+        .fulfill-button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        .cancel-button {
+            background-color: #dc3545;
+            /* Red */
+        }
+
+        .cancel-button:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
+
+        /* Optional: Adjust icon size if necessary */
+        .action-button i {
+            margin-right: 0;
+            /* Remove right margin since there's no text */
+        }
+
+        /* Tooltip Styles (Optional) */
+        .action-button[title] {
+            position: relative;
+        }
+
+        .action-button[title]::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 125%;
+            /* Position above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            font-size: 14px;
+        }
+
+        .action-button[title]:hover::after {
+            opacity: 1;
+        }
+
+        .status-pending {
+            color: #ffc107;
+            /* Amber */
+            font-weight: bold;
+        }
+
+        .status-in-progress {
+            color: #17a2b8;
+            /* Teal */
+            font-weight: bold;
+        }
+
+        .status-completed {
+            color: #28a745;
+            /* Green */
+            font-weight: bold;
+        }
+
+        .status-cancelled {
+            color: #dc3545;
+            /* Red */
+            font-weight: bold;
+        }
+
         .sidebar {
             width: 250px;
-            background-color: rgb(51, 7, 100);
+            background-color: #2e8b57;
             color: #fff;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             padding: 20px;
+            height: max-content;
         }
 
         .logo {
             text-align: center;
-            background-color: rgb(86, 27, 153);
+            background-color: #006400;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
@@ -80,14 +172,14 @@ $user_name = $_SESSION['name'];
 
         .nav ul li a:hover,
         .nav ul li a.active {
-            background-color: rgb(86, 27, 153);
-            box-shadow: inset 5px 0 0 #34495e;
+            background-color: #3cb371;
+            box-shadow: inset 5px 0 0 #006400;
         }
 
         .nav ul li a.active {
             background-color: #f4f4f9;
             color: #333;
-            box-shadow: inset 5px 0 0 #34495e;
+            box-shadow: inset 5px 0 0 #006400;
         }
 
         .logout {
@@ -124,7 +216,7 @@ $user_name = $_SESSION['name'];
         }
 
         .user-profile-button {
-            background-color: rgb(51, 7, 100);
+            background-color: #006400;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -135,46 +227,6 @@ $user_name = $_SESSION['name'];
 
         .user-profile-button:hover {
             transform: scale(1.1);
-        }
-
-        .overview {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
-            text-align: center;
-            flex: 1;
-            color: #333;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .card h3 {
-            margin-bottom: 10px;
-        }
-
-        .card p {
-            font-size: 1.2em;
-            margin: 0;
-        }
-
-        .charts {
-            margin-top: 20px;
-        }
-
-        .chart {
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .totals {
@@ -200,7 +252,7 @@ $user_name = $_SESSION['name'];
         .total-box p {
             font-size: 1.5em;
             margin: 0;
-            color: rgb(51, 7, 100);
+            color: #2e8b57;
         }
 
         table {
@@ -209,7 +261,7 @@ $user_name = $_SESSION['name'];
         }
 
         table thead {
-            background-color: rgb(51, 7, 100);
+            background-color: #2e8b57;
             color: white;
         }
 
@@ -234,8 +286,8 @@ $user_name = $_SESSION['name'];
             font-weight: bold;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 </head>
 
 <body>
@@ -247,9 +299,11 @@ $user_name = $_SESSION['name'];
             <nav class="nav">
                 <ul>
                     <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
-                    <li><a href="pickup.php"><i class="fas fa-truck"></i>Deliveries</a></li>
-                    <li><a href="earnings.php" class="active"><i class="fas fa-dollar-sign"></i>Earning Breakdown</a></li>
-                    <li><a href="vehicle.php"><i class="fas fa-car"></i>My Vehicle</a></li>
+                    <li><a href="customers.php"><i class="fas fa-users"></i>Customers</a></li>
+                    <li><a href="manage_services.php"><i class="fas fa-cogs"></i>Manage Services</a></li>
+                    <li><a href="orders.php"><i class="fas fa-box"></i>Orders</a></li>
+                    <li><a href="pickup.php"><i class="fas fa-chart-line"></i>Incoming Deliveries</a></li>
+                    <li><a href="earnings.php" class="active"><i class="fas fa-wallet"></i>Earnings</a></li>
                     <li><a href="profile.php"><i class="fas fa-user"></i>Profile</a></li>
                 </ul>
             </nav>
@@ -258,24 +312,25 @@ $user_name = $_SESSION['name'];
 
         <main class="main-content">
             <header class="main-header">
-                <h1>My Earnings</h1>
+                <h1>My Moneyyy</h1>
                 <div class="user-profile">
-                    <button class="user-profile-button">Yo, <?php echo htmlspecialchars($user_name); ?></button>
+                    <button class="user-profile-button">Hello, <?php echo htmlspecialchars($user_name); ?></button>
                 </div>
             </header>
+
 
             <div class="totals">
                 <div class="total-box">
                     <h3>Total Money Due</h3>
-                    <p id="total-due">0</p>
+                    <p id = "total-due">0</p>
                 </div>
                 <div class="total-box">
                     <h3>Total Paid</h3>
-                    <p id="total-paid">0</p>
+                    <p id = "total-paid">0</p>
                 </div>
                 <div class="total-box">
                     <h3>To be paid</h3>
-                    <p id="total-incomplete">0</p>
+                    <p id = "total-incomplete">0</p>
                 </div>
 
             </div>
@@ -293,11 +348,9 @@ $user_name = $_SESSION['name'];
                     <!-- Payments will be dynamically inserted here -->
                 </tbody>
             </table>
-
-
             <script>
                 $(document).ready(function() {
-                    const endpoint = '../actions/get_payments_by_driver.php';
+                    const endpoint = '../actions/get_payments_by_provider.php';
 
                     $.ajax({
                         url: endpoint,
@@ -315,14 +368,14 @@ $user_name = $_SESSION['name'];
 
                                 payments.forEach(payment => {
                                     const amount = parseFloat(payment.amt);
-                                    totalDue += amount;
+                                    totalDue += amount; // Fixed from 'amt' to 'amount'
 
                                     let statusClass = '';
                                     if (payment.payment_status.toLowerCase() === 'paid') {
-                                        totalPaid += amount;
+                                        totalPaid += amount; // Fixed from 'amt' to 'amount'
                                         statusClass = 'status-paid';
                                     } else if (payment.payment_status.toLowerCase() === 'incomplete') {
-                                        totalIncomplete += amount;
+                                        totalIncomplete += amount; // Fixed from 'amt' to 'amount'
                                         statusClass = 'status-incomplete';
                                     }
 

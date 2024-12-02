@@ -129,6 +129,7 @@ $user_name = $_SESSION['name'];
             flex-direction: column;
             justify-content: space-between;
             padding: 20px;
+            height: max-content;
         }
 
         .logo {
@@ -491,6 +492,7 @@ $user_name = $_SESSION['name'];
                     <li><a href="manage_services.php"><i class="fas fa-cogs"></i>Manage Services</a></li>
                     <li><a href="orders.php" class="active"><i class="fas fa-box"></i>Orders</a></li>
                     <li><a href="pickup.php"><i class="fas fa-chart-line"></i>Incoming Deliveries</a></li>
+                    <li><a href="earnings.php"><i class="fas fa-wallet"></i>Earnings</a></li>
                     <li><a href="profile.php"><i class="fas fa-user"></i>Profile</a></li>
                 </ul>
             </nav>
@@ -575,7 +577,6 @@ $user_name = $_SESSION['name'];
                 });
             }
 
-            // Populate Orders Table
             function populateOrdersTable(orders) {
                 var $tbody = $('#ordersTableBody');
                 $tbody.empty();
@@ -600,38 +601,35 @@ $user_name = $_SESSION['name'];
                     // Customer Contact
                     $('<td>').text(order.user_contact).appendTo($tr);
 
-                    // Add Click Event to Row
-                    $tr.on('click', function() {
-                        var orderId = $(this).data('order-id');
-                        showModal(orderId);
-                    });
-
                     // Actions
                     var $actions = $('<td>');
 
-                    // Fulfill Button
-                    $('<button>')
-                        .html('<i class="fas fa-check-circle"></i>') // FontAwesome Check Icon
-                        .addClass('action-button fulfill-button') // Add classes for styling
-                        .attr('title', 'Fulfill Order') // Tooltip for accessibility
-                        .on('click', function(event) {
-                            event.stopPropagation(); // Prevent triggering row click
-                            var orderId = $(this).closest('tr').data('order-id');
-                            fulfillOrder(orderId);
-                        })
-                        .appendTo($actions);
+                    // Only add action buttons if the status is 'In progress'
+                    if (order.status === 'In progress') {
+                        // Fulfill Button
+                        $('<button>')
+                            .html('<i class="fas fa-check-circle"></i> Fulfill') // FontAwesome Check Icon with label
+                            .addClass('action-button fulfill-button') // Add classes for styling
+                            .attr('title', 'Fulfill Order') // Tooltip for accessibility
+                            .on('click', function(event) {
+                                event.stopPropagation(); // Prevent triggering row click
+                                var orderId = $(this).closest('tr').data('order-id');
+                                fulfillOrder(orderId);
+                            })
+                            .appendTo($actions);
 
-                    // Cancel Button
-                    $('<button>')
-                        .html('<i class="fas fa-times-circle"></i>') // FontAwesome Times Icon
-                        .addClass('action-button cancel-button') // Add classes for styling
-                        .attr('title', 'Cancel Order') // Tooltip for accessibility
-                        .on('click', function(event) {
-                            event.stopPropagation(); // Prevent triggering row click
-                            var orderId = $(this).closest('tr').data('order-id');
-                            cancelOrder(orderId);
-                        })
-                        .appendTo($actions);
+                        // Cancel Button
+                        $('<button>')
+                            .html('<i class="fas fa-times-circle"></i> Cancel') // FontAwesome Times Icon with label
+                            .addClass('action-button cancel-button') // Add classes for styling
+                            .attr('title', 'Cancel Order') // Tooltip for accessibility
+                            .on('click', function(event) {
+                                event.stopPropagation(); // Prevent triggering row click
+                                var orderId = $(this).closest('tr').data('order-id');
+                                cancelOrder(orderId);
+                            })
+                            .appendTo($actions);
+                    }
 
                     $tr.append($actions);
                     $tbody.append($tr);
@@ -738,6 +736,105 @@ $user_name = $_SESSION['name'];
                     hideModal();
                 }
             });
+
+            // Fulfill Order
+            function fulfillOrder(orderId) {
+                Swal.fire({
+                    title: 'Fulfill Order',
+                    text: 'Are you sure you want to fulfill this order?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#dc3545',
+                    confirmButtonText: 'Yes, Fulfill Order'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '../actions/fulfillOrder.php',
+                            type: 'POST',
+                            data: {
+                                order_id: orderId
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                if (data.status === 'success') {
+                                    Swal.fire({
+                                        title: 'Order Fulfilled',
+                                        text: 'The order has been fulfilled successfully.',
+                                        icon: 'success'
+                                    }).then(() => {
+                                        fetchOrders();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: data.message,
+                                        icon: 'error'
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error fulfilling order:', error);
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'An error occurred while fulfilling the order.',
+                                    icon: 'error'
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Cancel Order
+            function cancelOrder(orderId) {
+                Swal.fire({
+                    title: 'Cancel Order',
+                    text: 'Are you sure you want to cancel this order?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, Cancel Order'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '../actions/cancelOrder.php',
+                            type: 'POST',
+                            data: {
+                                order_id: orderId
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                if (data.status === 'success') {
+                                    Swal.fire({
+                                        title: 'Order Cancelled',
+                                        text: 'The order has been cancelled successfully.',
+                                        icon: 'success'
+                                    }).then(() => {
+                                        fetchOrders();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: data.message,
+                                        icon: 'error'
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error cancelling order:', error);
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'An error occurred while cancelling the order.',
+                                    icon: 'error'
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
         });
     </script>
 </body>

@@ -147,12 +147,14 @@ class order_class extends db_connection
         p.provider_name, 
         p.provider_address, 
         u.user_name AS driver_name, 
-        u.user_contact AS driver_contact
+        u.user_contact AS driver_contact,
+        pmt.status AS payment_status
     FROM `orders` o
     LEFT JOIN `providers` p ON o.service_provider_id = p.provider_id
     LEFT JOIN `drivers` d ON o.service_provider_id = d.driver_id
     LEFT JOIN `users` u ON d.driver_id = u.user_id
     JOIN `order_details` od ON o.order_id = od.order_id
+    JOIN `payments` pmt ON o.order_id = pmt.order_id
     WHERE o.customer_id = '$customer_id'
     ORDER BY 
         CASE 
@@ -242,5 +244,26 @@ class order_class extends db_connection
         }
 
         return $order_id;
+    }
+
+    public function delete_order($payment_id)
+    {
+        $ndb = new db_connection();
+        $payment_id = mysqli_real_escape_string($ndb->db_conn(), $payment_id);
+
+        $sql = "SELECT `order_id` FROM `payments` WHERE `payment_id` = '$payment_id'";
+        $order = $this->db_fetch_one($sql);
+
+        if (!$order) {
+            return false;
+        }
+
+        $order_id = $order['order_id'];
+
+        $delete_order_details = "DELETE FROM `order_details` WHERE `order_id` = '$order_id'";
+        $this->db_query($delete_order_details);
+
+        $delete_order = "DELETE FROM `orders` WHERE `order_id` = '$order_id'";
+        return $this->db_query($delete_order);
     }
 }
