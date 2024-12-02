@@ -366,6 +366,7 @@ $user_name = $_SESSION['name'];
                     <li><a href="customers.php"><i class="fas fa-users"></i>Customers</a></li>
                     <li><a href="manage_services.php" class="active"><i class="fas fa-cogs"></i>Manage Services</a></li>
                     <li><a href="orders.php"><i class="fas fa-box"></i>Orders</a></li>
+                    <li><a href="pickup.php"><i class="fas fa-chart-line"></i>Incoming Deliveries</a></li>
                     <li><a href="profile.php"><i class="fas fa-user"></i>Profile</a></li>
                 </ul>
             </nav>

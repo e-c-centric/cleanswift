@@ -76,6 +76,11 @@ class delivery_controller
         return $this->delivery->get_deliveries_by_customer_id($customer_id);
     }
 
+    public function get_deliveries_by_provider_id($provider_id)
+    {
+        return $this->delivery->get_deliveries_by_provider_id($provider_id);
+    }
+
     // Get available deliveries for driver
     public function get_deliveries($vehicle_type)
     {

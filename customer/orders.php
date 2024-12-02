@@ -67,6 +67,56 @@ $user_name = $_SESSION['name'];
             margin: 10px 0;
         }
 
+        /* Make Payment Button Styling */
+        .make-payment-btn {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .make-payment-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Pulsing Row Animation */
+        @keyframes pulse {
+            0% {
+                background-color: rgba(0, 123, 255, 0.1);
+            }
+
+            50% {
+                background-color: rgba(0, 123, 255, 0.3);
+            }
+
+            100% {
+                background-color: rgba(0, 123, 255, 0.1);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Status Classes Styling */
+        .status-in-progress {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .status-fulfilled {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .status-cancelled {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
         .nav ul li a {
             display: flex;
             align-items: center;
@@ -410,6 +460,7 @@ $user_name = $_SESSION['name'];
                     <li><a href="../customer/providers.php"><i class="fas fa-store"></i>Available Providers</a></li>
                     <li><a href="../customer/cart.php"><i class="fas fa-shopping-cart"></i>My Cart</a></li>
                     <li><a href="../customer/orders.php" class="active"><i class="fas fa-box-open"></i>My Orders</a></li>
+                    <li><a href="../customer/deliveries.php"><i class="fas fa-user"></i>Deliveries</a></li>
                     <li><a href="../customer/customer_details.php"><i class="fas fa-user"></i>My Details</a></li>
                 </ul>
             </nav>
@@ -430,7 +481,7 @@ $user_name = $_SESSION['name'];
                             <th>Order Date</th>
                             <th>Status</th>
                             <th>Service Provider</th>
-                            <th>Address</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -472,7 +523,6 @@ $user_name = $_SESSION['name'];
         $(document).ready(function() {
             loadOrders();
 
-            // Function to Load Orders
             function loadOrders() {
                 $.ajax({
                     url: '../actions/getOrders.php',
@@ -492,14 +542,23 @@ $user_name = $_SESSION['name'];
                                     statusClass = 'status-cancelled';
                                 }
 
+                                // Determine the service provider name
+                                var serviceProviderName = order.driver_name ? order.driver_name : order.provider_name;
+
+                                // Determine if the status is 'Fulfilled' to show the payment button
+                                var paymentButton = '';
+                                if (order.status === 'Fulfilled') {
+                                    paymentButton = `<button class="make-payment-btn" data-order-id="${order.order_id}">Make Payment</button>`;
+                                }
+
                                 ordersTableBody.append(`
-                                <tr data-order-id="${order.order_id}">
-                                    <td>${order.order_date}</td>
-                                    <td class="${statusClass}">${order.status}</td>
-                                    <td>${order.provider_name}</td>
-                                    <td>${order.provider_address}</td>
-                                </tr>
-                            `);
+                        <tr data-order-id="${order.order_id}" class="pulse">
+                            <td>${order.order_date}</td>
+                            <td class="${statusClass}">${order.status}</td>
+                            <td>${serviceProviderName}</td>
+                            <td>${paymentButton}</td>
+                        </tr>
+                    `);
                             });
                             attachOrderClickHandlers();
                             $('.cart-table').show();
@@ -519,19 +578,19 @@ $user_name = $_SESSION['name'];
                 });
             }
 
-            // Function to Attach Click Handlers to Orders
+            // Function to Attach Click Handlers to Orders and Payment Buttons
             function attachOrderClickHandlers() {
-                $('.cart-table tbody tr').on('click', function() {
+                // Handler for row clicks
+                $('.cart-table tbody').on('click', 'tr', function() {
                     var orderId = $(this).data('order-id');
 
                     // Extract order-level details from the table row
                     var orderDate = $(this).find('td:eq(0)').text();
                     var status = $(this).find('td:eq(1)').text();
-                    var providerName = $(this).find('td:eq(2)').text();
-                    var providerAddress = $(this).find('td:eq(3)').text(); // Optional: Use if needed
+                    var serviceProviderName = $(this).find('td:eq(2)').text();
 
                     // Set order-level details in the modal
-                    $('#detailProviderName').text(providerName);
+                    $('#detailProviderName').text(serviceProviderName);
                     $('#detailOrderDate').text(orderDate);
                     $('#detailStatus').text(status);
 
@@ -548,6 +607,27 @@ $user_name = $_SESSION['name'];
 
                     // Fetch order items via AJAX
                     fetchOrderItems(orderId);
+                });
+
+                // Handler for Make Payment buttons using event delegation
+                $('.cart-table tbody').on('click', '.make-payment-btn', function(e) {
+                    e.stopPropagation(); // Prevent triggering the row click event
+                    var orderId = $(this).data('order-id');
+
+                    // Implement your payment logic here
+                    Swal.fire({
+                        title: 'Make Payment',
+                        text: `Proceed to make payment for Order ID: ${orderId}?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, Pay',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Redirect to payment page or initiate payment process
+                            window.location.href = `/payment.php?order_id=${orderId}`;
+                        }
+                    });
                 });
             }
 
@@ -608,7 +688,7 @@ $user_name = $_SESSION['name'];
                 }
             });
         });
-    </script> 
+    </script>
 </body>
 
 </html>

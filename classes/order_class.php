@@ -140,12 +140,22 @@ class order_class extends db_connection
         $ndb = new db_connection();
         $customer_id = mysqli_real_escape_string($ndb->db_conn(), $customer_id);
 
-        $sql = "SELECT o.order_id, o.order_date, o.status, 
-                       p.provider_name, p.provider_address
+        $sql = "SELECT 
+                    o.order_id, 
+                    o.order_date, 
+                    o.status, 
+                    p.provider_name, 
+                    p.provider_address, 
+                    u.user_name AS driver_name, 
+                    u.user_contact AS driver_contact
                 FROM `orders` o
-                JOIN `providers` p ON o.service_provider_id = p.provider_id
+                LEFT JOIN `providers` p ON o.service_provider_id = p.provider_id
+                LEFT JOIN `drivers` d ON o.service_provider_id = d.driver_id
+                LEFT JOIN `users` u ON d.driver_id = u.user_id
+                JOIN `order_details` od ON o.order_id = od.order_id
                 WHERE o.customer_id = '$customer_id'
                 ORDER BY o.order_date DESC";
+
         return $this->db_fetch_all($sql);
     }
 

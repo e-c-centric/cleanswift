@@ -35,18 +35,18 @@ $user_name = $_SESSION['name'];
 
         .sidebar {
             width: 250px;
-            background-color: rgb(51, 7, 100);
+            background-color: #343a40;
             color: #fff;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             padding: 20px;
-            height: 100%;
+            height: max-content;
         }
 
         .logo {
             text-align: center;
-            background-color: rgb(86, 27, 153);
+            background-color: #007bff;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
@@ -84,14 +84,14 @@ $user_name = $_SESSION['name'];
 
         .nav ul li a:hover,
         .nav ul li a.active {
-            background-color: rgb(86, 27, 153);
-            box-shadow: inset 5px 0 0 #34495e;
+            background-color: #495057;
+            box-shadow: inset 5px 0 0 #007bff;
         }
 
         .nav ul li a.active {
             background-color: #f4f4f9;
             color: #333;
-            box-shadow: inset 5px 0 0 #34495e;
+            box-shadow: inset 5px 0 0 #007bff;
         }
 
         .logout {
@@ -128,7 +128,7 @@ $user_name = $_SESSION['name'];
         }
 
         .user-profile-button {
-            background-color: rgb(51, 7, 100);
+            background-color: #007bff;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -140,6 +140,44 @@ $user_name = $_SESSION['name'];
         .user-profile-button:hover {
             transform: scale(1.1);
         }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .cart-table th,
+        .cart-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .cart-table th {
+            background-color: #007bff;
+            color: white;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .cart-table td {
+            vertical-align: middle;
+            background-color: #f9f9f9;
+        }
+
+        .cart-table tr:nth-child(even) td {
+            background-color: #f1f1f1;
+        }
+
+        .cart-table tr:hover td {
+            background-color: #e9ecef;
+        }
+
 
         /* Pickups Container */
         .deliveries-wrapper {
@@ -371,6 +409,290 @@ $user_name = $_SESSION['name'];
             background-color: #007bff;
         }
 
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Action Buttons Styles */
+        .action-button {
+            border: none;
+            padding: 8px 12px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .fulfill-button {
+            background-color: #28a745;
+            /* Green */
+        }
+
+        .fulfill-button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        .cancel-button {
+            background-color: #dc3545;
+            /* Red */
+        }
+
+        .cancel-button:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
+
+        /* Optional: Adjust icon size if necessary */
+        .action-button i {
+            margin-right: 0;
+            /* Remove right margin since there's no text */
+        }
+
+        /* Tooltip Styles (Optional) */
+        .action-button[title] {
+            position: relative;
+        }
+
+        .action-button[title]::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 125%;
+            /* Position above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            font-size: 14px;
+        }
+
+        .action-button[title]:hover::after {
+            opacity: 1;
+        }
+
+        .status-pending {
+            color: #ffc107;
+            /* Amber */
+            font-weight: bold;
+        }
+
+        .status-in-progress {
+            color: #17a2b8;
+            /* Teal */
+            font-weight: bold;
+        }
+
+        .status-completed {
+            color: #28a745;
+            /* Green */
+            font-weight: bold;
+        }
+
+        .status-cancelled {
+            color: #dc3545;
+            /* Red */
+            font-weight: bold;
+        }
+
+
+        .logout {
+            display: block;
+            padding: 15px 20px;
+            background-color: #dc3545;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .logout:hover {
+            background-color: #c82333;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f4f4f9;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .main-header h1 {
+            margin: 0;
+        }
+
+        .save-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .save-button:hover {
+            background-color: #218838;
+        }
+
+        /* Enhanced Order Items Table Styles */
+        .order-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-details th,
+        .order-details td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .order-details th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .order-details tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .order-details tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .order-details th:first-child,
+        .order-details td:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        .order-details th:last-child,
+        .order-details td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .order-details th,
+        .order-details td {
+            vertical-align: middle;
+        }
+
+        /* Responsive Styling */
+        @media screen and (max-width: 768px) {
+            .order-details table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .order-details th,
+            .order-details td {
+                padding: 10px;
+            }
+        }
+
+        /* Modal Enhancements */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px 40px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 10px;
+            position: relative;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            color: #aaa;
+            position: absolute;
+            right: 25px;
+            top: 20px;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: #000;
+        }
+
+        /* Order Details Header */
+        .order-details h3 {
+            margin-bottom: 15px;
+            color: #17a2b8;
+            font-size: 20px;
+            border-bottom: 2px solid #17a2b8;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
         /* Active Deliveries Container */
     </style>
 </head>
@@ -383,11 +705,13 @@ $user_name = $_SESSION['name'];
             </div>
             <nav class="nav">
                 <ul>
-                    <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
-                    <li><a href="pickup.php" class="active"><i class="fas fa-truck"></i>Deliveries</a></li>
-                    <li><a href="earnings.php"><i class="fas fa-dollar-sign"></i>Earning Breakdown</a></li>
-                    <li><a href="vehicle.php"><i class="fas fa-car"></i>My Vehicle</a></li>
-                    <li><a href="profile.php"><i class="fas fa-user"></i>Profile</a></li>
+                    <li><a href="../customer/dashboard.php"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
+                    <li><a href="../customer/services.php"><i class="fas fa-concierge-bell"></i>Available Services</a></li>
+                    <li><a href="../customer/providers.php"><i class="fas fa-store"></i>Available Providers</a></li>
+                    <li><a href="../customer/cart.php"><i class="fas fa-shopping-cart"></i>My Cart</a></li>
+                    <li><a href="../customer/orders.php"><i class="fas fa-box-open"></i>My Orders</a></li>
+                    <li><a href="../customer/deliveries.php" class="active"><i class="fas fa-user"></i>Deliveries</a></li>
+                    <li><a href="../customer/customer_details.php"><i class="fas fa-user"></i>My Details</a></li>
                 </ul>
             </nav>
             <a href="../login/logout.php" class="logout"><i class="fas fa-sign-out-alt"></i>Logout</a>
@@ -395,14 +719,12 @@ $user_name = $_SESSION['name'];
 
         <main class="main-content">
             <header class="main-header">
-                <h1>Pickups</h1>
+                <h1>Deliveries</h1>
                 <div class="user-profile">
                     <button class="user-profile-button">Wowza, <?php echo htmlspecialchars($user_name); ?></button>
                 </div>
             </header>
             <div class="deliveries-wrapper">
-                <div class="pickups-container">
-                </div>
                 <div class="active-deliveries-container">
                     <h2>Active Deliveries</h2>
                     <!-- Active Delivery Tiles will be dynamically loaded here -->
@@ -438,54 +760,11 @@ $user_name = $_SESSION['name'];
 
     <script>
         $(document).ready(function() {
-            fetchAvailableDeliveries();
             fetchActiveDeliveries();
-
-            function fetchAvailableDeliveries() {
-                $.ajax({
-                    url: '../actions/get_available_deliveries.php',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.status === 'success' && response.data.length > 0) {
-                            renderDeliveryTiles(response.data);
-                        } else {
-                            $('.pickups-container').html('<p>No available deliveries at the moment.</p>');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching deliveries:', error);
-                        $('.pickups-container').html('<p>Error loading available deliveries.</p>');
-                    }
-                });
-            }
-
-            function renderDeliveryTiles(deliveries) {
-                $('.pickups-container').empty();
-                $.each(deliveries, function(index, delivery) {
-                    var pickupTime = delivery.pickup_time;
-                    var deliveryId = delivery.delivery_id;
-
-                    var $tile = $('<div>').addClass('delivery-tile').attr('data-delivery-id', deliveryId);
-
-                    var $title = $('<h3>').addClass('delivery-title').text('Pickup Time: ' + pickupTime);
-                    var $status = $('<p>').addClass('delivery-status').text('Status: ' + delivery.delivery_status);
-                    var $pickupAddress = $('<p>').addClass('delivery-details').text('Pickup Address: ' + delivery.city);
-                    // var $cost = $('<p>').addClass('delivery-cost').text('Cost: $' + parseFloat(delivery.cost).toFixed(2));
-
-                    $tile.append($title, $status, $pickupAddress);
-
-                    $tile.on('click', function() {
-                        openDeliveryModal(deliveryId);
-                    });
-
-                    $('.pickups-container').append($tile);
-                });
-            }
 
             function fetchActiveDeliveries() {
                 $.ajax({
-                    url: '../actions/get_active_deliveries.php',
+                    url: '../actions/get_active_deliveries_by_customer.php',
                     type: 'GET',
                     dataType: 'json',
                     success: function(response) {
@@ -507,13 +786,18 @@ $user_name = $_SESSION['name'];
                 $('.active-deliveries-container').append('<h2>Active Deliveries</h2>');
 
                 $.each(activeDeliveries, function(index, delivery) {
-                    var pickupAddress = delivery.customer_city;
+                    var pickupAddress = delivery.dropoff_district;
                     var deliveryStatus = delivery.delivery_status;
                     var deliveryId = delivery.delivery_id;
+                    var driverName = delivery.driver_name;
+                    var vehicleNumber = delivery.vehicle_number;
+                    var vehicleType = delivery.vehicle_type;
 
                     var $tile = $('<div>').addClass('active-delivery-tile').attr('data-delivery-id', deliveryId);
 
-                    var $title = $('<h3>').text('Pickup Address: ' + pickupAddress);
+                    var $title = $('<h3>').text('Provider Address: ' + pickupAddress);
+                    var $driverInfo = $('<p>').text('Driver: ' + driverName);
+                    var $vehicleInfo = $('<p>').text('Vehicle: ' + vehicleNumber + ' (' + vehicleType + ')');
 
                     var $badge = $('<span>').addClass('badge');
                     switch (deliveryStatus.toLowerCase()) {
@@ -569,7 +853,8 @@ $user_name = $_SESSION['name'];
                         $checkboxGroup.append($label);
                     });
 
-                    $tile.append($title, $badge, $checkboxGroup);
+                    // Append driver information to the tile
+                    $tile.append($title, $driverInfo, $vehicleInfo, $badge, $checkboxGroup);
                     $('.active-deliveries-container').append($tile);
                 });
 
@@ -631,6 +916,9 @@ $user_name = $_SESSION['name'];
                                 $checkbox.prop('checked', false);
                             }
                         });
+                    } else {
+                        // Optionally handle unchecked scenarios if necessary
+                        // Currently, checkboxes up to current status are disabled, so unchecking shouldn't occur
                     }
                 });
             }
@@ -646,35 +934,43 @@ $user_name = $_SESSION['name'];
                     success: async function(response) {
                         console.log('GET Response:', response);
 
-                        if (response.status === 'success' && response.data) {
-                            const delivery = response.data;
+                        if (response.status === 'success' && response.data.length > 0) {
+                            const deliveries = response.data;
 
-                            const pickupDistrict = delivery.pickup_district;
-                            const dropoffDistrict = delivery.dropoff_district;
-                            const pickupAddress = delivery.customer_city;
-                            const dropoffAddress = delivery.provider_address;
+                            const pickupAddress = deliveries[0].customer_city;
 
-                            $('#customerAddress').text(pickupDistrict);
-                            $('#dropoffAddresses').html(dropoffDistrict + '<br>');
+                            let dropoffAddresses = deliveries.map(delivery => delivery.provider_address);
+                            dropoffAddresses = [...new Set(dropoffAddresses)];
 
+                            $('#customerAddress').text(pickupAddress);
+
+                            let dropoffHtml = '';
+                            dropoffAddresses.forEach(address => {
+                                dropoffHtml += address + '<br>';
+                            });
+                            $('#dropoffAddresses').html(dropoffHtml);
                             try {
                                 let totalCost = 0;
-
-                                const cost = await computeCost(pickupAddress, dropoffAddress);
-                                totalCost += cost;
+                                const costPromises = dropoffAddresses.map(dropoff => computeCost(pickupAddress, dropoff));
+                                const costs = await Promise.all(costPromises);
+                                costs.forEach(cost => {
+                                    totalCost += cost;
+                                });
                                 $('#deliveryCost').text('$' + totalCost.toFixed(2));
 
+                                // Remove existing Accept Trip button if any to prevent duplicates
                                 $('#accept-trip-btn').remove();
 
+                                // Create Accept Trip button
                                 const $acceptBtn = $('<button>')
                                     .attr('id', 'accept-trip-btn')
                                     .addClass('btn btn-primary')
                                     .text('Accept Trip');
 
-                                // Append the Accept Trip button to the modal content
+                                // Append the button to the modal-content
                                 $('.modal-content').append($acceptBtn);
 
-                                // Add a click event handler to the Accept Trip button
+                                // Click handler for Accept Trip button
                                 $acceptBtn.on('click', function() {
                                     $(this).attr('disabled', true).text('Accepting...');
 
@@ -715,10 +1011,8 @@ $user_name = $_SESSION['name'];
                                 Swal.fire("Error", "Failed to compute delivery cost.", "error");
                             }
 
-                            // Display the modal
                             $('#deliveryModal').fadeIn();
                         } else {
-                            // Handle cases where no delivery details are found
                             Swal.fire("No Details Found", "No delivery details found for this delivery.", "info");
                         }
                     },

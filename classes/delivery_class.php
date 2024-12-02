@@ -177,7 +177,7 @@ class delivery_class extends db_connection
         $ndb = new db_connection();
         $vehicle_class = mysqli_real_escape_string($ndb->db_conn(), $vehicle_class);
 
-        $sql = "SELECT * FROM `deliveries` WHERE `driver_id` IS NULL AND `vehicle_class` = '$vehicle_class'";
+        $sql = "SELECT deliveries.*, customers.customer_city  FROM `deliveries` JOIN customers ON deliveries.customer_id = customers.customer_id WHERE `driver_id` IS NULL AND `vehicle_class` = '$vehicle_class'";
         return $this->db_fetch_all($sql);
     }
 
@@ -268,7 +268,46 @@ class delivery_class extends db_connection
         $ndb = new db_connection();
         $customer_id = mysqli_real_escape_string($ndb->db_conn(), $customer_id);
 
-        $sql = "SELECT * FROM `deliveries` WHERE `customer_id` = '$customer_id'";
+        $sql = "SELECT 
+        deliveries.delivery_id, 
+        users_user.user_name AS customer_name, 
+        customers.customer_city, 
+        providers.provider_name, 
+        providers.provider_address, 
+        deliveries.pickup_time, 
+        deliveries.dropoff_time, 
+        deliveries.cost, 
+        deliveries.delivery_status,
+        deliveries.driver_id,
+        drivers_user.user_name AS driver_name,
+        vehicles.vehicle_number,
+        vehicles.vehicle_type
+    FROM `deliveries` 
+    JOIN `users` AS users_user ON deliveries.customer_id = users_user.user_id
+    JOIN `customers` ON deliveries.customer_id = customers.customer_id
+    JOIN `delivery_provider` ON deliveries.delivery_id = delivery_provider.delivery_id
+    JOIN `providers` ON delivery_provider.provider_id = providers.provider_id
+    JOIN `drivers` ON deliveries.driver_id = drivers.driver_id
+    JOIN `users` AS drivers_user ON drivers.driver_id = drivers_user.user_id
+    LEFT JOIN `vehicles` ON drivers.vehicle_id = vehicles.vehicle_id
+    WHERE `deliveries`.`customer_id` = '$customer_id'";
+
+        return $this->db_fetch_all($sql);
+    }
+
+    public function get_deliveries_by_provider_id($provider_id)
+    {
+        $ndb = new db_connection();
+        $provider_id = mysqli_real_escape_string($ndb->db_conn(), $provider_id);
+
+        $sql = "SELECT deliveries.delivery_id, users.user_name, customers.customer_city, providers.provider_name, providers.provider_address, deliveries.pickup_time, deliveries.dropoff_time, deliveries.cost, deliveries.delivery_status 
+        FROM `deliveries` 
+        JOIN `users` ON deliveries.customer_id = users.user_id
+        JOIN `customers` ON deliveries.customer_id = customers.customer_id
+        JOIN `delivery_provider` ON deliveries.delivery_id = delivery_provider.delivery_id
+        JOIN `providers` ON delivery_provider.provider_id = providers.provider_id
+        WHERE `providers`.`provider_id` = '$provider_id'";
+
         return $this->db_fetch_all($sql);
     }
 }

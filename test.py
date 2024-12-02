@@ -9,4 +9,4 @@ headers = {
 
 response = requests.request("POST", url, headers=headers, data = payload)
 
-print(response.json())
+print(response.json()['data']['Table'][0]['District'])

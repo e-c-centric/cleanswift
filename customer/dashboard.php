@@ -38,16 +38,7 @@ $user_name = $_SESSION['name'];
             flex-direction: column;
             justify-content: space-between;
             padding: 20px;
-            height: 100vh;
-            /* Ensures full viewport height */
-            position: fixed;
-            /* Fixes sidebar in place */
-            top: 0;
-            /* Aligns to the top of the viewport */
-            left: 0;
-            /* Aligns to the left of the viewport */
-            overflow-y: auto;
-            /* Adds scroll if content overflows */
+            height: max-content;
         }
 
         .logo {
@@ -201,6 +192,7 @@ $user_name = $_SESSION['name'];
                     <!-- <li><a href="../customer/drivers.php"><i class="fas fa-truck"></i>Available Drivers</a></li> -->
                     <li><a href="../customer/cart.php"><i class="fas fa-shopping-cart"></i>My Cart</a></li>
                     <li><a href="../customer/orders.php"><i class="fas fa-box-open"></i>My Orders</a></li>
+                    <li><a href="../customer/deliveries.php"><i class="fas fa-user"></i>Deliveries</a></li>
                     <li><a href="../customer/customer_details.php"><i class="fas fa-user"></i>My Details</a></li>
                 </ul>
             </nav>

@@ -298,6 +298,7 @@ $user_name = $_SESSION['name'];
                     <li><a href="../customer/providers.php"><i class="fas fa-store"></i>Available Providers</a></li>
                     <li><a href="../customer/cart.php"><i class="fas fa-shopping-cart"></i>My Cart</a></li>
                     <li><a href="../customer/orders.php"><i class="fas fa-box-open"></i>My Orders</a></li>
+                    <li><a href="../customer/deliveries.php"><i class="fas fa-user"></i>Deliveries</a></li>
                     <li><a href="../customer/customer_details.php" class="active"><i class="fas fa-user"></i>My Details</a></li>
                 </ul>
             </nav>
