@@ -38,7 +38,7 @@ $provider_name = $_SESSION['name'];
             flex-direction: column;
             justify-content: space-between;
             padding: 20px;
-            height: max-content;
+            height: 100%;
         }
 
         .logo {
@@ -138,42 +138,19 @@ $provider_name = $_SESSION['name'];
             transform: scale(1.1);
         }
 
-        .overview {
-            display: flex;
-            justify-content: space-around;
+        .welcome-message {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .welcome-message h2 {
+            font-size: 2.5em;
             margin-bottom: 20px;
         }
 
-        .card {
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
-            text-align: center;
-            flex: 1;
-            color: #333;
-        }
-
-        .card h3 {
-            margin-bottom: 10px;
-        }
-
-        .card p {
+        .welcome-message p {
             font-size: 1.2em;
-            margin: 0;
-        }
-
-        .charts {
-            margin-top: 20px;
-        }
-
-        .chart {
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
+            color: #666;
         }
     </style>
 </head>
@@ -206,28 +183,10 @@ $provider_name = $_SESSION['name'];
                 </div>
             </header>
 
-            <section class="overview">
-                <div class="card">
-                    <h3>Total Customers</h3>
-                    <p id="totalCustomers">50 Customers</p>
-                </div>
-                <div class="card">
-                    <h3>Pending Orders</h3>
-                    <p id="pendingOrders">15 Orders</p>
-                </div>
-                <div class="card">
-                    <h3>Completed Orders</h3>
-                    <p id="completedOrders">120 Orders</p>
-                </div>
+            <section class="welcome-message">
+                <h2>Welcome to Your Dashboard, <?php echo htmlspecialchars($provider_name); ?>!</h2>
+                <p>Here you can manage your services, view orders, track deliveries, and monitor your earnings. Use the navigation menu on the left to get started.</p>
             </section>
-
-            <section class="charts">
-                <div class="chart orders-chart">
-                    <h3>Orders Overview</h3>
-                    <canvas id="ordersChart"></canvas>
-                </div>
-            </section>
-
         </main>
     </div>
 </body>

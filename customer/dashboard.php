@@ -138,42 +138,19 @@ $user_name = $_SESSION['name'];
             transform: scale(1.1);
         }
 
-        .overview {
-            display: flex;
-            justify-content: space-around;
+        .welcome-message {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .welcome-message h2 {
+            font-size: 2.5em;
             margin-bottom: 20px;
         }
 
-        .card {
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
-            text-align: center;
-            flex: 1;
-            color: #333;
-        }
-
-        .card h3 {
-            margin-bottom: 10px;
-        }
-
-        .card p {
+        .welcome-message p {
             font-size: 1.2em;
-            margin: 0;
-        }
-
-        .charts {
-            margin-top: 20px;
-        }
-
-        .chart {
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 10px;
+            color: #666;
         }
     </style>
 </head>
@@ -189,7 +166,6 @@ $user_name = $_SESSION['name'];
                     <li><a href="../customer/dashboard.php" class="active"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
                     <li><a href="../customer/services.php"><i class="fas fa-concierge-bell"></i>Available Services</a></li>
                     <li><a href="../customer/providers.php"><i class="fas fa-store"></i>Available Providers</a></li>
-                    <!-- <li><a href="../customer/drivers.php"><i class="fas fa-truck"></i>Available Drivers</a></li> -->
                     <li><a href="../customer/cart.php"><i class="fas fa-shopping-cart"></i>My Cart</a></li>
                     <li><a href="../customer/orders.php"><i class="fas fa-box-open"></i>My Orders</a></li>
                     <li><a href="../customer/deliveries.php"><i class="fas fa-user"></i>Deliveries</a></li>
@@ -208,28 +184,10 @@ $user_name = $_SESSION['name'];
                 </div>
             </header>
 
-            <section class="overview">
-                <div class="card">
-                    <h3>Active Providers</h3>
-                    <p id="activeProviders">10 Providers</p>
-                </div>
-                <div class="card">
-                    <h3>Pending Services</h3>
-                    <p id="pendingServices">5 Pending</p>
-                </div>
-                <div class="card">
-                    <h3>Total Spending</h3>
-                    <p id="totalSpending">GHC500.00</p>
-                </div>
+            <section class="welcome-message">
+                <h2>Welcome to Your Dashboard, <?php echo htmlspecialchars($user_name); ?>!</h2>
+                <p>Here you can explore available services, manage your orders, and update your profile. Use the navigation menu on the left to get started.</p>
             </section>
-
-            <section class="charts">
-                <div class="chart spending-chart">
-                    <h3>Spending Overview</h3>
-                    <canvas id="spendingChart"></canvas>
-                </div>
-            </section>
-
         </main>
     </div>
 </body>
